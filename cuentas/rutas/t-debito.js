@@ -50,7 +50,7 @@ tDebitoRutas.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* 
         registrosTDebito,
     });
 }));
-// ACTUALIZAR Registro
+// ACTUALIZAR 
 tDebitoRutas.post('/update/:id', (req, res) => {
     const id = req.params.id;
     // const sobreMi = {

@@ -45,7 +45,7 @@ tDebitoRutas.get('/', async (req: any, res: Response) => {
     })
 })
 
-// ACTUALIZAR Registro
+// ACTUALIZAR 
 tDebitoRutas.post('/update/:id', (req: Request, res: Response) => {
     const id = req.params.id
     // const sobreMi = {
