@@ -34,12 +34,12 @@ tDebitoRutas.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* 
     let saltar = pagina - 1;
     const registrosPorPagina = 10;
     saltar = saltar * registrosPorPagina;
-    const registrosTDebito = yield tDebito_1.TDebito.find()
+    const registrosTDebito = yield tDebito_1.TDebito.find({ activo: true })
         .sort({ _id: -1 })
         .skip(saltar)
         .limit(registrosPorPagina) // Limit es para el número de usuarios que queremos obtener
         .exec();
-    const totalRegistrosDebito = yield tDebito_1.TDebito.find()
+    const totalRegistrosDebito = yield tDebito_1.TDebito.find({ activo: true })
         .exec();
     res.json({
         ok: true,
@@ -53,14 +53,35 @@ tDebitoRutas.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* 
 // ACTUALIZAR 
 tDebitoRutas.post('/update/:id', (req, res) => {
     const id = req.params.id;
-    // const sobreMi = {
-    //     texto1: req.body.texto1,
-    //     texto2: req.body.texto2,
-    //     texto3: req.body.texto3,
-    //     texto4: req.body.texto4,
-    //     texto5: req.body.texto5
-    // }
-    tDebito_1.TDebito.findByIdAndUpdate(id, { new: true }, (err, registroDebito) => {
+    const payload = {
+        monto: req.body.monto,
+        tipo: req.body.tipo,
+        descripcion: req.body.descripcion,
+        idUsuarioCreacion: req.body.idUsuarioCreacion,
+        activo: req.body.activo
+    };
+    tDebito_1.TDebito.findByIdAndUpdate(id, payload, { new: true }, (err, registroDebito) => {
+        if (err)
+            throw err;
+        if (!registroDebito) {
+            return res.json({
+                ok: false,
+                mensaje: 'Datos incorrectos'
+            });
+        }
+        res.json({
+            ok: true,
+            registroDebito
+        });
+    });
+});
+// Eliminar registro 
+tDebitoRutas.post('/delete/:id', (req, res) => {
+    const id = req.params.id;
+    const payload = {
+        activo: true
+    };
+    tDebito_1.TDebito.findByIdAndUpdate(id, payload, { new: true }, (err, registroDebito) => {
         if (err)
             throw err;
         if (!registroDebito) {

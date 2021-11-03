@@ -1,18 +1,21 @@
 import { model, Schema } from 'mongoose'
-import { ITDebito } from '../interfaces/t-debito.interface'
+import { ITCredito } from '../interfaces/t-credito.interface'
 
-const tDebitoShema = new Schema({
+const tCreditoShema = new Schema({
     created: {
         type: Date
     },
     monto: {
         type: Number
     },
-    tipo: {
-        type: String
+    cuotas: {
+        type: Number
     },
     descripcion: {
         type: String
+    },
+    facturacionInmediata: {
+        type: Boolean
     },
     idUsuarioCreacion: {
         type: Number
@@ -23,9 +26,9 @@ const tDebitoShema = new Schema({
 })
 
 
-tDebitoShema.pre<ITDebito>('save', function (next) {
+tCreditoShema.pre<ITCredito>('save', function (next) {
     this.created = new Date()
     this.idUsuarioCreacion = 1
     next()
 })
-export const TDebito = model<ITDebito>('TDebito', tDebitoShema)
+export const TCredito = model<ITCredito>('TCredito', tCreditoShema)

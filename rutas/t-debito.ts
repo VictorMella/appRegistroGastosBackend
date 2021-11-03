@@ -27,12 +27,12 @@ tDebitoRutas.get('/', async (req: any, res: Response) => {
     let saltar = pagina - 1
     const registrosPorPagina = 10
     saltar = saltar * registrosPorPagina
-    const registrosTDebito = await TDebito.find()
+    const registrosTDebito = await TDebito.find( { activo: true } )
         .sort({ _id: -1 })
         .skip(saltar)
         .limit(registrosPorPagina) // Limit es para el número de usuarios que queremos obtener
         .exec()
-    const totalRegistrosDebito = await TDebito.find()    
+    const totalRegistrosDebito = await TDebito.find({ activo: true })    
         .exec()
 
     res.json({
@@ -48,15 +48,36 @@ tDebitoRutas.get('/', async (req: any, res: Response) => {
 // ACTUALIZAR 
 tDebitoRutas.post('/update/:id', (req: Request, res: Response) => {
     const id = req.params.id
-    // const sobreMi = {
-    //     texto1: req.body.texto1,
-    //     texto2: req.body.texto2,
-    //     texto3: req.body.texto3,
-    //     texto4: req.body.texto4,
-    //     texto5: req.body.texto5
-    // }
+    const payload = {
+        monto: req.body.monto,
+        tipo: req.body.tipo,
+        descripcion: req.body.descripcion,
+        idUsuarioCreacion: req.body.idUsuarioCreacion,
+        activo: req.body.activo
+    }
 
-    TDebito.findByIdAndUpdate(id, { new: true }, (err, registroDebito) => {
+    TDebito.findByIdAndUpdate(id, payload, { new: true }, (err, registroDebito) => {
+        if (err) throw err
+        if (!registroDebito) {
+            return res.json({
+                ok: false,
+                mensaje: 'Datos incorrectos'
+            })
+        }
+        res.json({
+            ok: true,
+            registroDebito
+        })
+    })
+})
+// Eliminar registro 
+tDebitoRutas.post('/delete/:id', (req: Request, res: Response) => {
+    const id = req.params.id
+    const payload = {
+        activo: true
+    }
+
+    TDebito.findByIdAndUpdate(id, payload, { new: true }, (err, registroDebito) => {
         if (err) throw err
         if (!registroDebito) {
             return res.json({

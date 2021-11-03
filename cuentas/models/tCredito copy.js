@@ -1,19 +1,22 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TDebito = void 0;
+exports.TCredito = void 0;
 const mongoose_1 = require("mongoose");
-const tDebitoShema = new mongoose_1.Schema({
+const tcreditoShema = new mongoose_1.Schema({
     created: {
         type: Date
     },
     monto: {
         type: Number
     },
-    tipo: {
-        type: String
+    cuotas: {
+        type: Number
     },
     descripcion: {
         type: String
+    },
+    facturacionInmediata: {
+        type: Boolean
     },
     idUsuarioCreacion: {
         type: Number
@@ -22,9 +25,9 @@ const tDebitoShema = new mongoose_1.Schema({
         type: Boolean
     }
 });
-tDebitoShema.pre('save', function (next) {
+tcreditoShema.pre('save', function (next) {
     this.created = new Date();
     this.idUsuarioCreacion = 1;
     next();
 });
-exports.TDebito = (0, mongoose_1.model)('TDebito', tDebitoShema);
+exports.TCredito = (0, mongoose_1.model)('TCredito', tcreditoShema);

@@ -6,11 +6,11 @@ import cors from 'cors'
 import tDebitoRutas from "./rutas/t-debito"
 
 import { IConnectOptions } from "./interfaces/i-conecctionOptions.interface"
+import tCreditoRutas from "./rutas/t-creditoNacional"
+import tCreditoRutasInternacional from "./rutas/t-creditoInternacional"
 
 
 const server = new Server
-
-
 
 //BODY PARSER
 server.app.use(bodyParser.urlencoded({ extended: true }))
@@ -30,6 +30,8 @@ mongoose.connect(
 
 //Rutas del proyecto
 server.app.use('/debito', tDebitoRutas)
+server.app.use('/credito', tCreditoRutas)
+server.app.use('/credito-internacional', tCreditoRutasInternacional)
 
 //Levantar servidor
 server.start(() => console.log(`Hola, estoy en el puerto ${server.port}`))
