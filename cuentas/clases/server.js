@@ -8,7 +8,7 @@ const serverport = Number(process.env.PORT) || 3000;
 class Server {
     constructor() {
         this.port = 3000;
-        this.app = (0, express_1.default)();
+        this.app = express_1.default();
         this.port = serverport;
     }
     start(res) {

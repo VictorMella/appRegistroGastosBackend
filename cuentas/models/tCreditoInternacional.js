@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TCreditoInternacional = void 0;
 const mongoose_1 = require("mongoose");
 const tCreditoInternacionalShema = new mongoose_1.Schema({
     created: {
@@ -30,4 +29,4 @@ tCreditoInternacionalShema.pre('save', function (next) {
     this.idUsuarioCreacion = 1;
     next();
 });
-exports.TCreditoInternacional = (0, mongoose_1.model)('TCreditoInternacional', tCreditoInternacionalShema);
+exports.TCreditoInternacional = mongoose_1.model('TCreditoInternacional', tCreditoInternacionalShema);

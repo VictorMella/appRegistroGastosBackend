@@ -5,6 +5,9 @@ const tDebitoShema = new Schema({
     created: {
         type: Date
     },
+    fechaCompra: {
+        type: Date
+    },
     monto: {
         type: Number
     },
@@ -19,6 +22,12 @@ const tDebitoShema = new Schema({
     },
     activo: {
         type: Boolean
+    },
+    mes: {
+        type: Number
+    },
+    anio: {
+        type: Number
     }
 })
 
@@ -26,6 +35,7 @@ const tDebitoShema = new Schema({
 tDebitoShema.pre<ITDebito>('save', function (next) {
     this.created = new Date()
     this.idUsuarioCreacion = 1
+    this.activo = true
     next()
 })
 export const TDebito = model<ITDebito>('TDebito', tDebitoShema)

@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const tCredito_1 = require("../models/tCredito");
-const tCreditoRutas = (0, express_1.Router)();
+const tCreditoRutas = express_1.Router();
 //Crear registro
 tCreditoRutas.post('/crear-registro', (req, res) => {
     const body = req.body;
