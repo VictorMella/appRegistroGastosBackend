@@ -40,7 +40,7 @@ tDebitoRutas.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* 
     const registrosPorPagina = req.query.registrosPorPagina;
     saltar = saltar * registrosPorPagina;
     const registrosTDebito = yield tDebito_1.TDebito.find({ activo: true })
-        .sort({ _id: -1 }) // Ordenar lista
+        .sort({ fechaCompra: -1 }) // Ordenar lista
         .skip(saltar) //Saltar registros
         .limit(registrosPorPagina) // Limit es para el número de usuarios que queremos obtener
         .exec();
