@@ -17,6 +17,7 @@ tDebitoRutas.post('/crear-registro', (req, res) => {
     let body = req.body;
     body.mes = parseInt(body.fechaCompra.split('-')[1]);
     body.anio = parseInt(body.fechaCompra.split('-')[0]);
+    console.log(body);
     tDebito_1.TDebito.create(body)
         .then(registroDebito => {
         res.json({
@@ -60,14 +61,17 @@ tDebitoRutas.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* 
 }));
 // ACTUALIZAR 
 tDebitoRutas.post('/update', (req, res) => {
+    let body = req.body;
     const payload = {
-        id: req.body.id,
+        id: req.body._id,
         monto: req.body.monto,
         tipo: req.body.tipo,
         descripcion: req.body.descripcion,
-        idUsuarioCreacion: req.body.idUsuarioCreacion,
-        activo: req.body.activo
+        fechaCompra: req.body.fechaCompra,
+        mes: parseInt(req.body.fechaCompra.split('-')[1]),
+        anio: parseInt(req.body.fechaCompra.split('-')[0])
     };
+    console.log(payload);
     tDebito_1.TDebito.findByIdAndUpdate(payload.id, payload, { new: true }, (err, registroDebito) => {
         if (err)
             throw err;

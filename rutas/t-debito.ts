@@ -1,4 +1,5 @@
 import { Router, Request, Response } from "express"
+import { DtoPayloadDebito } from "../interfaces/i-payloadDebito.interface"
 import { TDebito } from "../models/tDebito"
 
 const tDebitoRutas = Router()
@@ -8,6 +9,7 @@ tDebitoRutas.post('/crear-registro', (req: Request, res: Response) => {
     let body = req.body
     body.mes = parseInt(body.fechaCompra.split('-')[1])
     body.anio = parseInt(body.fechaCompra.split('-')[0])
+    console.log(body)
     TDebito.create(body)
         .then(registroDebito => {
             res.json({
@@ -55,15 +57,17 @@ tDebitoRutas.get('/', async (req: any, res: Response) => {
 
 // ACTUALIZAR 
 tDebitoRutas.post('/update', (req: Request, res: Response) => {
-    const payload = {
-        id: req.body.id,
+    let body = req.body
+    const payload: DtoPayloadDebito = {
+        id: req.body._id,
         monto: req.body.monto,
         tipo: req.body.tipo,
         descripcion: req.body.descripcion,
-        idUsuarioCreacion: req.body.idUsuarioCreacion,
-        activo: req.body.activo
+        fechaCompra: req.body.fechaCompra,
+        mes: parseInt(req.body.fechaCompra.split('-')[1]),
+        anio: parseInt(req.body.fechaCompra.split('-')[0])
     }
-
+    console.log(payload)
     TDebito.findByIdAndUpdate(payload.id, payload, { new: true }, (err, registroDebito) => {
         if (err) throw err
         if (!registroDebito) {

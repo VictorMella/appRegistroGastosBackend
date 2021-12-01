@@ -10,4 +10,5 @@ export interface ITDebito extends Document {
     activo: boolean
     mes: number
     anio: number
+    fechaCreacion: Date
 }

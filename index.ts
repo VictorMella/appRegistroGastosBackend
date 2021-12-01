@@ -2,6 +2,8 @@ import bodyParser from "body-parser"
 import mongoose from "mongoose"
 import Server from "./clases/server"
 import cors from 'cors'
+import express from 'express'
+import path from 'path'
 
 import tDebitoRutas from "./rutas/t-debito"
 
@@ -9,6 +11,7 @@ import { IConnectOptions } from "./interfaces/i-conecctionOptions.interface"
 import tCreditoRutas from "./rutas/t-creditoNacional"
 import tCreditoRutasInternacional from "./rutas/t-creditoInternacional"
 
+const key = require('./environment/environment')
 
 const server = new Server
 
@@ -25,10 +28,17 @@ const options: IConnectOptions  = {
 }
 
 //CONECTAR BD
+// let mongoDB: string
+// if (process.env && process.env.NODE_ENV === 'production') {
+//     mongoDB = `mongodb+srv://AdminRegister:${key}@registrocuentas.09jiw.mongodb.nett/gastosBD`
+// } else {
+//     mongoDB = 'mongodb://localhost:27017/gastosBD'
+// }
 mongoose.connect(
     'mongodb://localhost:27017/gastosBD', options)
 
 //Rutas del proyecto
+server.app.use(express.static(path.join((__dirname + '/public'))));
 server.app.use('/debito', tDebitoRutas)
 server.app.use('/credito', tCreditoRutas)
 server.app.use('/credito-internacional', tCreditoRutasInternacional)
