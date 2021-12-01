@@ -17,7 +17,6 @@ tDebitoRutas.post('/crear-registro', (req, res) => {
     let body = req.body;
     body.mes = parseInt(body.fechaCompra.split('-')[1]);
     body.anio = parseInt(body.fechaCompra.split('-')[0]);
-    console.log(body);
     tDebito_1.TDebito.create(body)
         .then(registroDebito => {
         res.json({
@@ -38,14 +37,14 @@ tDebitoRutas.post('/crear-registro', (req, res) => {
 tDebitoRutas.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let pagina = Number(req.query.pagina) || 1;
     let saltar = pagina - 1;
-    const registrosPorPagina = req.query.registrosPorPagina;
+    const registrosPorPagina = Number(req.query.registrosPorPagina) || 10;
     saltar = saltar * registrosPorPagina;
-    const registrosTDebito = yield tDebito_1.TDebito.find({ activo: true })
+    const registrosTDebito = yield tDebito_1.TDebito.find({ activo: true, mes: req.query.mes, anio: req.query.anio })
         .sort({ fechaCompra: -1 }) // Ordenar lista
         .skip(saltar) //Saltar registros
         .limit(registrosPorPagina) // Limit es para el número de usuarios que queremos obtener
         .exec();
-    const totalRegistrosDebito = yield tDebito_1.TDebito.find({ activo: true })
+    const totalRegistrosDebito = yield tDebito_1.TDebito.find({ activo: true, mes: req.query.mes, anio: req.query.anio })
         .exec();
     res.json({
         ok: true,
@@ -61,7 +60,6 @@ tDebitoRutas.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* 
 }));
 // ACTUALIZAR 
 tDebitoRutas.post('/update', (req, res) => {
-    let body = req.body;
     const payload = {
         id: req.body._id,
         monto: req.body.monto,
@@ -71,7 +69,6 @@ tDebitoRutas.post('/update', (req, res) => {
         mes: parseInt(req.body.fechaCompra.split('-')[1]),
         anio: parseInt(req.body.fechaCompra.split('-')[0])
     };
-    console.log(payload);
     tDebito_1.TDebito.findByIdAndUpdate(payload.id, payload, { new: true }, (err, registroDebito) => {
         if (err)
             throw err;

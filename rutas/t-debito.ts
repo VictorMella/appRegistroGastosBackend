@@ -9,7 +9,6 @@ tDebitoRutas.post('/crear-registro', (req: Request, res: Response) => {
     let body = req.body
     body.mes = parseInt(body.fechaCompra.split('-')[1])
     body.anio = parseInt(body.fechaCompra.split('-')[0])
-    console.log(body)
     TDebito.create(body)
         .then(registroDebito => {
             res.json({
@@ -32,14 +31,14 @@ tDebitoRutas.post('/crear-registro', (req: Request, res: Response) => {
 tDebitoRutas.get('/', async (req: any, res: Response) => {
     let pagina = Number(req.query.pagina) || 1
     let saltar = pagina - 1
-    const registrosPorPagina = req.query.registrosPorPagina
+    const registrosPorPagina = Number(req.query.registrosPorPagina) || 10
     saltar = saltar * registrosPorPagina
-    const registrosTDebito = await TDebito.find( { activo: true } )
+    const registrosTDebito = await TDebito.find( { activo: true, mes: req.query.mes, anio: req.query.anio  } )
         .sort({ fechaCompra: -1 }) // Ordenar lista
         .skip(saltar) //Saltar registros
         .limit(registrosPorPagina) // Limit es para el número de usuarios que queremos obtener
         .exec()
-    const totalRegistrosDebito = await TDebito.find({ activo: true })    
+    const totalRegistrosDebito = await TDebito.find( { activo: true, mes: req.query.mes, anio: req.query.anio  })    
         .exec()
 
     res.json({
@@ -51,13 +50,12 @@ tDebitoRutas.get('/', async (req: any, res: Response) => {
             registrosPorPagina: registrosPorPagina,
             totalRegistros: totalRegistrosDebito.length,
             registrosTDebito,
-        }]      
+        }]
     })
 })
 
 // ACTUALIZAR 
 tDebitoRutas.post('/update', (req: Request, res: Response) => {
-    let body = req.body
     const payload: DtoPayloadDebito = {
         id: req.body._id,
         monto: req.body.monto,
@@ -67,7 +65,6 @@ tDebitoRutas.post('/update', (req: Request, res: Response) => {
         mes: parseInt(req.body.fechaCompra.split('-')[1]),
         anio: parseInt(req.body.fechaCompra.split('-')[0])
     }
-    console.log(payload)
     TDebito.findByIdAndUpdate(payload.id, payload, { new: true }, (err, registroDebito) => {
         if (err) throw err
         if (!registroDebito) {
