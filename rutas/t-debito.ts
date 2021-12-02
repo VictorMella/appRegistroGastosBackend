@@ -24,7 +24,6 @@ tDebitoRutas.post('/crear-registro', (req: Request, res: Response) => {
                 data: []
             })
         })
-
 })
 
 // Registos paginados
@@ -33,13 +32,13 @@ tDebitoRutas.get('/', async (req: any, res: Response) => {
     let saltar = pagina - 1
     const registrosPorPagina = Number(req.query.registrosPorPagina) || 10
     saltar = saltar * registrosPorPagina
-    const registrosTDebito = await TDebito.find( { activo: true, mes: req.query.mes, anio: req.query.anio  } )
+    const registrosTDebito = await TDebito.find({ activo: true, mes: req.query.mes, anio: req.query.anio })
         .sort({ fechaCompra: -1 }) // Ordenar lista
         .skip(saltar) //Saltar registros
         .limit(registrosPorPagina) // Limit es para el número de usuarios que queremos obtener
         .exec()
-    const totalRegistrosDebito = await TDebito.find( { activo: true, mes: req.query.mes, anio: req.query.anio  })    
-        .exec() 
+    const totalRegistrosDebito = await TDebito.find({ activo: true, mes: req.query.mes, anio: req.query.anio })
+        .exec()
 
     res.json({
         ok: true,

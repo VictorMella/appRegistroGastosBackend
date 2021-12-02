@@ -14,17 +14,22 @@ const tCredito_1 = require("../models/tCredito");
 const tCreditoRutas = express_1.Router();
 //Crear registro
 tCreditoRutas.post('/crear-registro', (req, res) => {
-    const body = req.body;
+    let body = req.body;
+    body.mes = parseInt(body.fechaCompra.split('-')[1]);
+    body.anio = parseInt(body.fechaCompra.split('-')[0]);
     tCredito_1.TCredito.create(body)
-        .then(registroDebito => {
+        .then(registroCredito => {
         res.json({
             ok: true,
-            registroDebito
+            mensaje: 'Registro creado correctamente',
+            data: [registroCredito]
         });
     })
         .catch(err => {
         res.json({
-            err
+            ok: false,
+            mensaje: err,
+            data: []
         });
     });
 });
@@ -32,67 +37,88 @@ tCreditoRutas.post('/crear-registro', (req, res) => {
 tCreditoRutas.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let pagina = Number(req.query.pagina) || 1;
     let saltar = pagina - 1;
-    const registrosPorPagina = 10;
+    const registrosPorPagina = Number(req.query.registrosPorPagina) || 10;
     saltar = saltar * registrosPorPagina;
-    const registrosTDebito = yield tCredito_1.TCredito.find({ activo: true })
-        .sort({ _id: -1 })
-        .skip(saltar)
+    const registrosTCredito = yield tCredito_1.TCredito.find({ activo: true, mes: req.query.mes, anio: req.query.anio })
+        .sort({ fechaCompra: -1 }) // Ordenar lista
+        .skip(saltar) //Saltar registros
         .limit(registrosPorPagina) // Limit es para el número de usuarios que queremos obtener
         .exec();
-    const totalRegistrosDebito = yield tCredito_1.TCredito.find({ activo: true })
+    const totalRegistrosCredito = yield tCredito_1.TCredito.find({ activo: true, mes: req.query.mes, anio: req.query.anio })
         .exec();
     res.json({
         ok: true,
-        pagina,
-        cantidadRegistros: registrosTDebito.length,
-        registrosPorPagina: registrosPorPagina,
-        totalRegistros: totalRegistrosDebito.length,
-        registrosTDebito,
+        mensaje: '',
+        data: [{
+                pagina,
+                cantidadRegistros: registrosTCredito.length,
+                registrosPorPagina: registrosPorPagina,
+                totalRegistros: totalRegistrosCredito.length,
+                registrosTCredito,
+            }]
+    });
+}));
+// Años con registros
+tCreditoRutas.get('/anio', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const añosConRegistros = yield tCredito_1.TCredito.find({ activo: true })
+        .sort({ anio: -1 }) // Ordenar lista    
+        .exec();
+    res.json({
+        ok: true,
+        mensaje: '',
+        data: [...new Set(añosConRegistros.map(item => item.anio))]
     });
 }));
 // ACTUALIZAR 
 tCreditoRutas.post('/update/:id', (req, res) => {
-    const id = req.params.id;
     const payload = {
+        id: req.body._id,
         monto: req.body.monto,
         tipo: req.body.tipo,
+        cuotas: req.body.cuotas,
+        facturacionInmediata: req.body.facturacionInmediata,
         descripcion: req.body.descripcion,
-        idUsuarioCreacion: req.body.idUsuarioCreacion,
-        activo: req.body.activo
+        fechaCompra: req.body.fechaCompra,
+        mes: parseInt(req.body.fechaCompra.split('-')[1]),
+        anio: parseInt(req.body.fechaCompra.split('-')[0])
     };
-    tCredito_1.TCredito.findByIdAndUpdate(id, payload, { new: true }, (err, registroDebito) => {
+    tCredito_1.TCredito.findByIdAndUpdate(payload.id, payload, { new: true }, (err, registroCredito) => {
         if (err)
             throw err;
-        if (!registroDebito) {
+        if (!registroCredito) {
             return res.json({
                 ok: false,
-                mensaje: 'Datos incorrectos'
+                mensaje: 'Datos incorrectos',
+                data: []
             });
         }
         res.json({
             ok: true,
-            registroDebito
+            mensaje: 'Registro actualizado correctamente',
+            data: [registroCredito]
         });
     });
 });
 // Eliminar registro 
 tCreditoRutas.post('/delete/:id', (req, res) => {
-    const id = req.params.id;
     const payload = {
-        activo: true
+        activo: false,
+        id: req.body._id
     };
-    tCredito_1.TCredito.findByIdAndUpdate(id, payload, { new: true }, (err, registroDebito) => {
+    tCredito_1.TCredito.findByIdAndUpdate(payload.id, payload, { new: true }, (err, registroCredito) => {
         if (err)
             throw err;
-        if (!registroDebito) {
+        if (!registroCredito) {
             return res.json({
                 ok: false,
-                mensaje: 'Datos incorrectos'
+                mensaje: 'Datos incorrectos',
+                data: []
             });
         }
         res.json({
             ok: true,
-            registroDebito
+            mensaje: 'Registro eliminado correctamente',
+            data: [registroCredito]
         });
     });
 });

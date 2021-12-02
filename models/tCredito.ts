@@ -5,6 +5,9 @@ const tCreditoShema = new Schema({
     created: {
         type: Date
     },
+    fechaCompra: {
+        type: Date
+    },
     monto: {
         type: Number
     },
@@ -12,6 +15,9 @@ const tCreditoShema = new Schema({
         type: Number
     },
     descripcion: {
+        type: String
+    },
+    tipo: {
         type: String
     },
     facturacionInmediata: {
@@ -22,6 +28,12 @@ const tCreditoShema = new Schema({
     },
     activo: {
         type: Boolean
+    },
+    mes: {
+        type: Number
+    },
+    anio: {
+        type: Number
     }
 })
 
@@ -29,6 +41,7 @@ const tCreditoShema = new Schema({
 tCreditoShema.pre<ITCredito>('save', function (next) {
     this.created = new Date()
     this.idUsuarioCreacion = 1
+    this.activo = true
     next()
 })
 export const TCredito = model<ITCredito>('TCredito', tCreditoShema)

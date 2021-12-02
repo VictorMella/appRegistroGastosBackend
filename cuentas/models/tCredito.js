@@ -5,6 +5,9 @@ const tCreditoShema = new mongoose_1.Schema({
     created: {
         type: Date
     },
+    fechaCompra: {
+        type: Date
+    },
     monto: {
         type: Number
     },
@@ -12,6 +15,9 @@ const tCreditoShema = new mongoose_1.Schema({
         type: Number
     },
     descripcion: {
+        type: String
+    },
+    tipo: {
         type: String
     },
     facturacionInmediata: {
@@ -22,11 +28,18 @@ const tCreditoShema = new mongoose_1.Schema({
     },
     activo: {
         type: Boolean
+    },
+    mes: {
+        type: Number
+    },
+    anio: {
+        type: Number
     }
 });
 tCreditoShema.pre('save', function (next) {
     this.created = new Date();
     this.idUsuarioCreacion = 1;
+    this.activo = true;
     next();
 });
 exports.TCredito = mongoose_1.model('TCredito', tCreditoShema);
