@@ -39,7 +39,7 @@ tDebitoRutas.get('/', async (req: any, res: Response) => {
         .limit(registrosPorPagina) // Limit es para el número de usuarios que queremos obtener
         .exec()
     const totalRegistrosDebito = await TDebito.find( { activo: true, mes: req.query.mes, anio: req.query.anio  })    
-        .exec()
+        .exec() 
 
     res.json({
         ok: true,
@@ -51,6 +51,19 @@ tDebitoRutas.get('/', async (req: any, res: Response) => {
             totalRegistros: totalRegistrosDebito.length,
             registrosTDebito,
         }]
+    })
+})
+
+// Años con registros
+tDebitoRutas.get('/anio', async (req: any, res: Response) => {
+    const añosConRegistros = await TDebito.find({ activo: true })
+        .sort({ anio: -1 }) // Ordenar lista    
+        .exec()
+
+    res.json({
+        ok: true,
+        mensaje: '',
+        data: [... new Set(añosConRegistros.map(item => item.anio))]
     })
 })
 
