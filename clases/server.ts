@@ -1,5 +1,5 @@
 import express from 'express'
-const serverport: number = Number(process.env.PORT) || 3000
+const serverport: number =  3000 || Number(process.env.PORT)
 
 export default class Server {
     public app: express.Application

@@ -12,4 +12,5 @@ export interface DtoPayloadCredito  {
     anio?: number
     facturacionInmediata?: boolean
     cuotas: number
+    nCuota: number
 }

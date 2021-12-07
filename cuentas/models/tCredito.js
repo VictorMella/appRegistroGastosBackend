@@ -34,6 +34,12 @@ const tCreditoShema = new mongoose_1.Schema({
     },
     anio: {
         type: Number
+    },
+    identificador: {
+        type: String
+    },
+    nCuota: {
+        type: Number
     }
 });
 tCreditoShema.pre('save', function (next) {

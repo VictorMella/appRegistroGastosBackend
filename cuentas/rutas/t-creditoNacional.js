@@ -14,9 +14,7 @@ const tCredito_1 = require("../models/tCredito");
 const tCreditoRutas = express_1.Router();
 //Crear registro
 tCreditoRutas.post('/crear-registro', (req, res) => {
-    let body = req.body;
-    body.mes = parseInt(body.fechaCompra.split('-')[1]);
-    body.anio = parseInt(body.fechaCompra.split('-')[0]);
+    let body = formatPayloadLsCredito(req.body);
     tCredito_1.TCredito.create(body)
         .then(registroCredito => {
         res.json({
@@ -58,15 +56,15 @@ tCreditoRutas.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function*
             }]
     });
 }));
-// Años con registros
+// // Años con registros
 tCreditoRutas.get('/anio', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const añosConRegistros = yield tCredito_1.TCredito.find({ activo: true })
-        .sort({ anio: -1 }) // Ordenar lista    
+        .sort({ anio: -1 }) // Ordenar lista
         .exec();
     res.json({
         ok: true,
         mensaje: '',
-        data: [...new Set(añosConRegistros.map(item => item.anio))]
+        data: [...new Set(añosConRegistros.filter(item => item.anio).map(item => item.anio))]
     });
 }));
 // ACTUALIZAR 
@@ -76,6 +74,7 @@ tCreditoRutas.post('/update/:id', (req, res) => {
         monto: req.body.monto,
         tipo: req.body.tipo,
         cuotas: req.body.cuotas,
+        nCuota: req.body.nCuotas,
         facturacionInmediata: req.body.facturacionInmediata,
         descripcion: req.body.descripcion,
         fechaCompra: req.body.fechaCompra,
@@ -122,4 +121,57 @@ tCreditoRutas.post('/delete/:id', (req, res) => {
         });
     });
 });
+const formatPayloadLsCredito = (lsRegistro) => {
+    const identificador = makeRandomId(12);
+    let totalCompra = lsRegistro.monto;
+    if (lsRegistro.cuotas === 1) {
+        const date = lsRegistro.fechaCompra.toString();
+        lsRegistro.facturacionInmediata = true;
+        lsRegistro.mes = parseInt(date.split('-')[1]);
+        lsRegistro.anio = parseInt(date.split('-')[0]);
+        lsRegistro.identificador = identificador;
+        return lsRegistro;
+    }
+    if (lsRegistro.cuotas > 1) {
+        let contador = 0, arrayLsRegistros = [];
+        const date = lsRegistro.fechaCompra.toString(), facturacionInmediata = lsRegistro.facturacionInmediata;
+        let cuotas = lsRegistro.cuotas, anio = parseInt(date.split('-')[0]), mes = parseInt(date.split('-')[1]);
+        while (contador < cuotas) {
+            if (mes === 12) {
+                lsRegistro.mes = 1;
+                lsRegistro.anio = parseInt(date.split('-')[0]) + 1;
+                mes = 1;
+            }
+            else {
+                console.log('ANTES MAS 12', lsRegistro.mes, contador);
+                lsRegistro.mes = mes + contador;
+                lsRegistro.anio = lsRegistro.anio || anio;
+                console.log('DESPUES MAS 12', lsRegistro.mes, contador);
+            }
+            lsRegistro.nCuota = contador + 1;
+            lsRegistro.monto = Math.round(totalCompra / cuotas);
+            lsRegistro.identificador = identificador;
+            crearRegistros(lsRegistro);
+            contador += 1;
+        }
+    }
+};
+const crearRegistros = (lsRegistro) => {
+    let res;
+    tCredito_1.TCredito.create(lsRegistro)
+        .then(registroCredito => {
+        console.log('ok');
+    })
+        .catch(err => {
+        console.log('badRequest');
+    });
+};
+const makeRandomId = (length) => {
+    let result = '';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    for (let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return result;
+};
 exports.default = tCreditoRutas;

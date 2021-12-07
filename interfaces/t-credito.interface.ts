@@ -1,6 +1,4 @@
-import { Document } from 'mongoose'
-
-export interface ITCredito extends Document {
+export interface ITCredito  {
     id?: string
     created: Date
     monto: number
@@ -12,5 +10,7 @@ export interface ITCredito extends Document {
     activo: boolean
     mes: number
     anio: number
-    fechaCreacion: Date
+    fechaCompra: Date | string
+    identificador: number | string
+    nCuota: number
 }
