@@ -96,7 +96,7 @@ tCreditoRutas.post('/update/:id', (req: Request, res: Response) => {
     })
 })
 // Eliminar registro 
-tCreditoRutas.post('/delete/:id', (req: Request, res: Response) => {
+tCreditoRutas.post('/delete', (req: Request, res: Response) => {
     const payload = {
         activo: false,
         id: req.body._id
@@ -127,6 +127,7 @@ const formatPayloadLsCredito = (lsRegistro: ITCredito) => {
         lsRegistro.mes = parseInt(date.split('-')[1])
         lsRegistro.anio = parseInt(date.split('-')[0])
         lsRegistro.identificador = identificador
+        lsRegistro.nCuota = 1
         return lsRegistro
     }
     if (lsRegistro.cuotas > 1) {
