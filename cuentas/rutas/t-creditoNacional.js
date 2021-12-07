@@ -133,7 +133,7 @@ const formatPayloadLsCredito = (lsRegistro) => {
         return lsRegistro;
     }
     if (lsRegistro.cuotas > 1) {
-        let contador = 0, arrayLsRegistros = [];
+        let contador = 0;
         const date = lsRegistro.fechaCompra.toString(), facturacionInmediata = lsRegistro.facturacionInmediata;
         let cuotas = lsRegistro.cuotas, anio = parseInt(date.split('-')[0]), mes = parseInt(date.split('-')[1]);
         while (contador < cuotas) {
@@ -143,14 +143,20 @@ const formatPayloadLsCredito = (lsRegistro) => {
                 mes = 1;
             }
             else {
-                console.log('ANTES MAS 12', lsRegistro.mes, contador);
                 lsRegistro.mes = mes + contador;
                 lsRegistro.anio = lsRegistro.anio || anio;
-                console.log('DESPUES MAS 12', lsRegistro.mes, contador);
             }
             lsRegistro.nCuota = contador + 1;
             lsRegistro.monto = Math.round(totalCompra / cuotas);
             lsRegistro.identificador = identificador;
+            if (!facturacionInmediata) {
+                lsRegistro.mes += 1;
+                if (lsRegistro.mes > 12) {
+                    lsRegistro.mes = 1;
+                    lsRegistro.anio += 1;
+                    mes = 1;
+                }
+            }
             crearRegistros(lsRegistro);
             contador += 1;
         }
@@ -159,11 +165,11 @@ const formatPayloadLsCredito = (lsRegistro) => {
 const crearRegistros = (lsRegistro) => {
     let res;
     tCredito_1.TCredito.create(lsRegistro)
-        .then(registroCredito => {
-        console.log('ok');
+        .then(() => {
+        console.log('registroCredito ok');
     })
         .catch(err => {
-        console.log('badRequest');
+        console.log('badRequest', err);
     });
 };
 const makeRandomId = (length) => {
