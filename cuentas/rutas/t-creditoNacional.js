@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const tCredito_1 = require("../models/tCredito");
+const moment = require('moment');
 const tCreditoRutas = express_1.Router();
 //Crear registro
 tCreditoRutas.post('/crear-registro', (req, res) => {
@@ -135,29 +136,17 @@ const formatPayloadLsCredito = (lsRegistro) => {
     }
     if (lsRegistro.cuotas > 1) {
         let contador = 0;
-        const date = lsRegistro.fechaCompra.toString(), facturacionInmediata = lsRegistro.facturacionInmediata;
-        let cuotas = lsRegistro.cuotas, anio = parseInt(date.split('-')[0]), mes = parseInt(date.split('-')[1]);
+        let cuotas = lsRegistro.cuotas, newMes = new Date(lsRegistro.fechaCompra);
+        const valorAddMes = lsRegistro.facturacionInmediata ? 0 : 1;
         while (contador < cuotas) {
-            if (mes === 12) {
-                lsRegistro.mes = 1;
-                lsRegistro.anio = parseInt(date.split('-')[0]) + 1;
-                mes = 1;
-            }
-            else {
-                lsRegistro.mes = mes + contador;
-                lsRegistro.anio = lsRegistro.anio || anio;
-            }
+            const addNewMes = moment(newMes).add((contador + valorAddMes), 'months');
+            const formatMes = moment(addNewMes).format('YYYY-MM-DD').toString();
+            const addanio = parseInt(formatMes.split('-')[0]), addmes = parseInt(formatMes.split('-')[1]);
+            lsRegistro.mes = addmes;
+            lsRegistro.anio = addanio;
             lsRegistro.nCuota = contador + 1;
             lsRegistro.monto = Math.round(totalCompra / cuotas);
             lsRegistro.identificador = identificador;
-            if (!facturacionInmediata) {
-                lsRegistro.mes += 1;
-                if (lsRegistro.mes > 12) {
-                    lsRegistro.mes = 1;
-                    lsRegistro.anio += 1;
-                    mes = 1;
-                }
-            }
             crearRegistros(lsRegistro);
             contador += 1;
         }

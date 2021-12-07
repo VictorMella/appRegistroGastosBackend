@@ -32,14 +32,14 @@ const tCreditoShema = new Schema({
     mes: {
         type: Number
     },
+    nCuota: {
+        type: Number
+    },
     anio: {
         type: Number
     },
     identificador: {
         type: String
-    },
-    nCuota: {
-        type: Number
     }
 })
 
