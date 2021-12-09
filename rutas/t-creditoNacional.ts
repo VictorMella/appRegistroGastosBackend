@@ -3,7 +3,7 @@ import { DtoPayloadCredito } from "../interfaces/i-payloadCredito.interface"
 import { ITCredito } from "../interfaces/t-credito.interface"
 import { TCredito } from "../models/tCredito"
 
-const moment = require('moment');
+const moment = require('moment')
 
 const tCreditoRutas = Router()
 
@@ -98,26 +98,24 @@ tCreditoRutas.post('/update/:id', (req: Request, res: Response) => {
     })
 })
 // Eliminar registro 
-tCreditoRutas.post('/delete', (req: Request, res: Response) => {
+tCreditoRutas.post('/delete', async (req: Request, res: Response) => {
+    const identificador = req.body.identificador
     const payload = {
         activo: false,
         id: req.body._id
     }
-    TCredito.findByIdAndUpdate(payload.id, payload, { new: true }, (err, registroCredito) => {
-        if (err) throw err
-        if (!registroCredito) {
-            return res.json({
-                ok: false,
-                mensaje: 'Datos incorrectos',
-                data: []
-            })
-        }
-        res.json({
-            ok: true,
-            mensaje: 'Registro eliminado correctamente',
-            data: [registroCredito]
+    const lsRegsitrosPorEliminar = await TCredito.find({ identificador: identificador })
+    let ultimoRegistro = false
+    if (lsRegsitrosPorEliminar.length > 0) {
+        lsRegsitrosPorEliminar.forEach((item, index) => {
+            const payload = {
+                activo: false,
+                id: item._id
+            }
+            ultimoRegistro = lsRegsitrosPorEliminar.length == index + 1
+            eliminarRegistros(payload, res, ultimoRegistro)
         })
-    })
+    }
 })
 
 const formatPayloadLsCredito = (lsRegistro: ITCredito) => {
@@ -140,21 +138,45 @@ const formatPayloadLsCredito = (lsRegistro: ITCredito) => {
             const addNewMes = moment(newMes).add((contador + valorAddMes), 'months')
             const formatMes = moment(addNewMes).format('YYYY-MM-DD').toString()
             const addanio = parseInt(formatMes.split('-')[0]), addmes = parseInt(formatMes.split('-')[1])
-            lsRegistro.mes = addmes 
-            lsRegistro.anio = addanio        
+            lsRegistro.mes = addmes
+            lsRegistro.anio = addanio
             lsRegistro.nCuota = contador + 1
             lsRegistro.monto = Math.round(totalCompra / cuotas)
-            lsRegistro.identificador = identificador  
+            lsRegistro.identificador = identificador
             crearRegistros(lsRegistro)
             contador += 1
         }
     }
 }
 
+const eliminarRegistros = (payload: any, res: Response, ultimoRegistro: boolean): void => {
+    TCredito.findByIdAndUpdate(payload.id, payload, { new: true }, (err, registroCredito) => {
+        if (err) {
+            console.log(err)
+            res.sendStatus(500)
+            return
+        }
+        if (!registroCredito && ultimoRegistro) {
+            return res.json({
+                ok: false,
+                mensaje: 'Datos incorrectos',
+                data: []
+            })
+        }
+        if (ultimoRegistro) {
+            res.json({
+                ok: true,
+                mensaje: 'Registro eliminado correctamente',
+                data: []
+            })
+        }
+    })
+}
+
 const crearRegistros = (lsRegistro: any): void => {
     let res: Response<any, Record<string, any>>
     TCredito.create(lsRegistro)
-        .then(() => {
+        .then((res) => {
             console.log('registroCredito ok')
         })
         .catch(err => {

@@ -100,28 +100,25 @@ tCreditoRutas.post('/update/:id', (req, res) => {
     });
 });
 // Eliminar registro 
-tCreditoRutas.post('/delete', (req, res) => {
+tCreditoRutas.post('/delete', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const identificador = req.body.identificador;
     const payload = {
         activo: false,
         id: req.body._id
     };
-    tCredito_1.TCredito.findByIdAndUpdate(payload.id, payload, { new: true }, (err, registroCredito) => {
-        if (err)
-            throw err;
-        if (!registroCredito) {
-            return res.json({
-                ok: false,
-                mensaje: 'Datos incorrectos',
-                data: []
-            });
-        }
-        res.json({
-            ok: true,
-            mensaje: 'Registro eliminado correctamente',
-            data: [registroCredito]
+    const lsRegsitrosPorEliminar = yield tCredito_1.TCredito.find({ identificador: identificador });
+    let ultimoRegistro = false;
+    if (lsRegsitrosPorEliminar.length > 0) {
+        lsRegsitrosPorEliminar.forEach((item, index) => {
+            const payload = {
+                activo: false,
+                id: item._id
+            };
+            ultimoRegistro = lsRegsitrosPorEliminar.length == index + 1;
+            eliminarRegistros(payload, res, ultimoRegistro);
         });
-    });
-});
+    }
+}));
 const formatPayloadLsCredito = (lsRegistro) => {
     const identificador = makeRandomId(12);
     let totalCompra = lsRegistro.monto;
@@ -152,10 +149,33 @@ const formatPayloadLsCredito = (lsRegistro) => {
         }
     }
 };
+const eliminarRegistros = (payload, res, ultimoRegistro) => {
+    tCredito_1.TCredito.findByIdAndUpdate(payload.id, payload, { new: true }, (err, registroCredito) => {
+        if (err) {
+            console.log(err);
+            res.sendStatus(500);
+            return;
+        }
+        if (!registroCredito && ultimoRegistro) {
+            return res.json({
+                ok: false,
+                mensaje: 'Datos incorrectos',
+                data: []
+            });
+        }
+        if (ultimoRegistro) {
+            res.json({
+                ok: true,
+                mensaje: 'Registro eliminado correctamente',
+                data: []
+            });
+        }
+    });
+};
 const crearRegistros = (lsRegistro) => {
     let res;
     tCredito_1.TCredito.create(lsRegistro)
-        .then(() => {
+        .then((res) => {
         console.log('registroCredito ok');
     })
         .catch(err => {

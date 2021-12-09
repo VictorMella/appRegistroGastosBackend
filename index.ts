@@ -22,8 +22,21 @@ server.app.use(bodyParser.json())
 // CORS
 server.app.use(cors({ origin: true, credentials: true }))
 
+server.app.use((req, res, next) => {
 
-const options: IConnectOptions  = {
+    // Dominio que tengan acceso (ej. 'http://example.com')
+    res.setHeader('Access-Control-Allow-Origin', '*')
+
+    // Metodos de solicitud que deseas permitir
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE')
+
+    // Encabecedados que permites (ej. 'X-Requested-With,content-type')
+    res.setHeader('Access-Control-Allow-Headers', '*')
+
+    next()
+})
+
+const options: IConnectOptions = {
     useNewUrlParser: true
 }
 
@@ -38,7 +51,7 @@ mongoose.connect(
     'mongodb://localhost:27017/gastosBD', options)
 
 //Rutas del proyecto
-server.app.use(express.static(path.join((__dirname + '/public'))));
+server.app.use(express.static(path.join((__dirname + '/public'))))
 server.app.use('/debito', tDebitoRutas)
 server.app.use('/credito', tCreditoRutas)
 server.app.use('/credito-internacional', tCreditoRutasInternacional)

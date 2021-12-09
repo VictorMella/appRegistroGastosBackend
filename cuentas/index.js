@@ -19,6 +19,15 @@ server.app.use(body_parser_1.default.urlencoded({ extended: true }));
 server.app.use(body_parser_1.default.json());
 // CORS
 server.app.use(cors_1.default({ origin: true, credentials: true }));
+server.app.use((req, res, next) => {
+    // Dominio que tengan acceso (ej. 'http://example.com')
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    // Metodos de solicitud que deseas permitir
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+    // Encabecedados que permites (ej. 'X-Requested-With,content-type')
+    res.setHeader('Access-Control-Allow-Headers', '*');
+    next();
+});
 const options = {
     useNewUrlParser: true
 };
