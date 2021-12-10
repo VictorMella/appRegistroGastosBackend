@@ -55,15 +55,20 @@ tDebitoRutas.get('/', async (req: any, res: Response) => {
 
 // Años con registros
 tDebitoRutas.get('/anio', async (req: any, res: Response) => {
-    const añosConRegistros = await TDebito.find({ activo: true })
-        .sort({ anio: -1 }) // Ordenar lista    
-        .exec()
+    try {
+        const añosConRegistros = await TDebito.find({ activo: true })
+            .sort({ anio: -1 }) // Ordenar lista    
+            .exec()
 
-    res.json({
-        ok: true,
-        mensaje: '',
-        data: [... new Set(añosConRegistros.map(item => item.anio))]
-    })
+        res.json({
+            ok: true,
+            mensaje: '',
+            data: [... new Set(añosConRegistros.map(item => item.anio))]
+        })
+    } catch (err) {
+        next(err)
+    }
+ 
 })
 
 // ACTUALIZAR 

@@ -60,14 +60,19 @@ tDebitoRutas.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* 
 }));
 // Años con registros
 tDebitoRutas.get('/anio', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const añosConRegistros = yield tDebito_1.TDebito.find({ activo: true })
-        .sort({ anio: -1 }) // Ordenar lista    
-        .exec();
-    res.json({
-        ok: true,
-        mensaje: '',
-        data: [...new Set(añosConRegistros.map(item => item.anio))]
-    });
+    try {
+        const añosConRegistros = yield tDebito_1.TDebito.find({ activo: true })
+            .sort({ anio: -1 }) // Ordenar lista    
+            .exec();
+        res.json({
+            ok: true,
+            mensaje: '',
+            data: [...new Set(añosConRegistros.map(item => item.anio))]
+        });
+    }
+    catch (err) {
+        next(err);
+    }
 }));
 // ACTUALIZAR 
 tDebitoRutas.post('/update', (req, res) => {
