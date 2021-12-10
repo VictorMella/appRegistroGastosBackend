@@ -38,16 +38,16 @@ tCreditoRutas.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function*
     let saltar = pagina - 1;
     const registrosPorPagina = Number(req.query.registrosPorPagina) || 10;
     saltar = saltar * registrosPorPagina;
-    const registrosTCredito = yield tCredito_1.TCredito.find({ activo: true, mes: req.query.mes, anio: req.query.anio })
+    const registrosTCredito = yield tCredito_1.TCredito.find({ activo: true, mes: req.query.mes, anio: req.query.anio, nacional: req.query.registrosNacionales })
         .sort({ fechaCompra: -1 }) // Ordenar lista
         .skip(saltar) //Saltar registros
         .limit(registrosPorPagina) // Limit es para el número de usuarios que queremos obtener
         .exec();
-    const totalRegistrosCredito = yield tCredito_1.TCredito.find({ activo: true, mes: req.query.mes, anio: req.query.anio })
+    const totalRegistrosCredito = yield tCredito_1.TCredito.find({ activo: true, mes: req.query.mes, anio: req.query.anio, nacional: req.query.registrosNacionales })
         .exec();
     res.json({
-        ok: true,
-        mensaje: '',
+        ok: totalRegistrosCredito.length ? true : false,
+        mensaje: totalRegistrosCredito.length ? '' : 'Busqueda sin resultados',
         data: [{
                 pagina,
                 cantidadRegistros: registrosTCredito.length,
@@ -59,7 +59,7 @@ tCreditoRutas.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function*
 }));
 // // Años con registros
 tCreditoRutas.get('/anio', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const añosConRegistros = yield tCredito_1.TCredito.find({ activo: true })
+    const añosConRegistros = yield tCredito_1.TCredito.find({ activo: true, nacional: req.query.registrosNacionales })
         .sort({ anio: -1 }) // Ordenar lista
         .exec();
     res.json({

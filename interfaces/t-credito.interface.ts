@@ -13,4 +13,5 @@ export interface ITCredito  {
     fechaCompra: Date | string
     identificador: number | string
     nCuota: number
+    nacional: boolean
 }

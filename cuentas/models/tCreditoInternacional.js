@@ -5,6 +5,9 @@ const tCreditoInternacionalShema = new mongoose_1.Schema({
     created: {
         type: Date
     },
+    fechaCompra: {
+        type: Date
+    },
     monto: {
         type: Number
     },
@@ -12,6 +15,9 @@ const tCreditoInternacionalShema = new mongoose_1.Schema({
         type: Number
     },
     descripcion: {
+        type: String
+    },
+    tipo: {
         type: String
     },
     facturacionInmediata: {
@@ -22,6 +28,18 @@ const tCreditoInternacionalShema = new mongoose_1.Schema({
     },
     activo: {
         type: Boolean
+    },
+    mes: {
+        type: Number
+    },
+    nCuota: {
+        type: Number
+    },
+    anio: {
+        type: Number
+    },
+    identificador: {
+        type: String
     }
 });
 tCreditoInternacionalShema.pre('save', function (next) {

@@ -41,8 +41,8 @@ tDebitoRutas.get('/', async (req: any, res: Response) => {
         .exec()
 
     res.json({
-        ok: true,
-        mensaje: '',
+        ok: totalRegistrosDebito.length ? true : false,
+        mensaje: totalRegistrosDebito.length ? '' : 'Busqueda sin resultados',
         data: [{
             pagina,
             cantidadRegistros: registrosTDebito.length,

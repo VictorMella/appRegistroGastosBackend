@@ -11,15 +11,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const tCreditoInternacional_1 = require("../models/tCreditoInternacional");
-const tCreditoRutasInternacional = express_1.Router();
+const tCreditoInternacionalRutas = express_1.Router();
 //Crear registro
-tCreditoRutasInternacional.post('/crear-registro', (req, res) => {
-    const body = req.body;
+tCreditoInternacionalRutas.post('/crear-registro', (req, res) => {
+    let body = formatPayloadLsCredito(req.body);
     tCreditoInternacional_1.TCreditoInternacional.create(body)
-        .then(registroDebito => {
+        .then(registroCreditoInternacional => {
         res.json({
             ok: true,
-            registroDebito
+            registroCreditoInternacional
         });
     })
         .catch(err => {
@@ -29,29 +29,32 @@ tCreditoRutasInternacional.post('/crear-registro', (req, res) => {
     });
 });
 // Registos paginados
-tCreditoRutasInternacional.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+tCreditoInternacionalRutas.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     let pagina = Number(req.query.pagina) || 1;
     let saltar = pagina - 1;
     const registrosPorPagina = 10;
     saltar = saltar * registrosPorPagina;
-    const registrosTDebito = yield tCreditoInternacional_1.TCreditoInternacional.find({ activo: true })
+    const registrosTCreditoInternacional = yield tCreditoInternacional_1.TCreditoInternacional.find({ activo: true, mes: req.query.mes, anio: req.query.anio })
         .sort({ _id: -1 })
         .skip(saltar)
         .limit(registrosPorPagina) // Limit es para el número de usuarios que queremos obtener
         .exec();
-    const totalRegistrosDebito = yield tCreditoInternacional_1.TCreditoInternacional.find({ activo: true })
+    const totalRegistrosCreditoInternacional = yield tCreditoInternacional_1.TCreditoInternacional.find({ activo: true, mes: req.query.mes, anio: req.query.anio })
         .exec();
     res.json({
-        ok: true,
-        pagina,
-        cantidadRegistros: registrosTDebito.length,
-        registrosPorPagina: registrosPorPagina,
-        totalRegistros: totalRegistrosDebito.length,
-        registrosTDebito,
+        ok: totalRegistrosCreditoInternacional.length ? true : false,
+        mensaje: totalRegistrosCreditoInternacional.length ? '' : 'Busqueda sin resultados',
+        data: [{
+                pagina,
+                cantidadRegistros: registrosTCreditoInternacional.length,
+                registrosPorPagina: registrosPorPagina,
+                totalRegistros: totalRegistrosCreditoInternacional.length,
+                registrosTCreditoInternacional,
+            }]
     });
 }));
 // ACTUALIZAR 
-tCreditoRutasInternacional.post('/update/:id', (req, res) => {
+tCreditoInternacionalRutas.post('/update/:id', (req, res) => {
     const id = req.params.id;
     const payload = {
         monto: req.body.monto,
@@ -75,16 +78,26 @@ tCreditoRutasInternacional.post('/update/:id', (req, res) => {
         });
     });
 });
+tCreditoInternacionalRutas.get('/anio', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const añosConRegistros = yield tCreditoInternacional_1.TCreditoInternacional.find({ activo: true })
+        .sort({ anio: -1 }) // Ordenar lista
+        .exec();
+    res.json({
+        ok: true,
+        mensaje: '',
+        data: [...new Set(añosConRegistros.filter(item => item.anio).map(item => item.anio))]
+    });
+}));
 // Eliminar registro 
-tCreditoRutasInternacional.post('/delete/:id', (req, res) => {
+tCreditoInternacionalRutas.post('/delete/:id', (req, res) => {
     const id = req.params.id;
     const payload = {
         activo: true
     };
-    tCreditoInternacional_1.TCreditoInternacional.findByIdAndUpdate(id, payload, { new: true }, (err, registroDebito) => {
+    tCreditoInternacional_1.TCreditoInternacional.findByIdAndUpdate(id, payload, { new: true }, (err, registroCreditoInternacional) => {
         if (err)
             throw err;
-        if (!registroDebito) {
+        if (!registroCreditoInternacional) {
             return res.json({
                 ok: false,
                 mensaje: 'Datos incorrectos'
@@ -92,8 +105,26 @@ tCreditoRutasInternacional.post('/delete/:id', (req, res) => {
         }
         res.json({
             ok: true,
-            registroDebito
+            registroCreditoInternacional
         });
     });
 });
-exports.default = tCreditoRutasInternacional;
+const formatPayloadLsCredito = (lsRegistro) => {
+    const identificador = makeRandomId(12);
+    const date = lsRegistro.fechaCompra.toString();
+    lsRegistro.facturacionInmediata = true;
+    lsRegistro.mes = parseInt(date.split('-')[1]);
+    lsRegistro.anio = parseInt(date.split('-')[0]);
+    lsRegistro.identificador = identificador;
+    lsRegistro.nCuota = 1;
+    return lsRegistro;
+};
+const makeRandomId = (length) => {
+    let result = '';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    for (let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return result;
+};
+exports.default = tCreditoInternacionalRutas;

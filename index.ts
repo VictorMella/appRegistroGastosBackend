@@ -9,7 +9,7 @@ import tDebitoRutas from "./rutas/t-debito"
 
 import { IConnectOptions } from "./interfaces/i-conecctionOptions.interface"
 import tCreditoRutas from "./rutas/t-creditoNacional"
-import tCreditoRutasInternacional from "./rutas/t-creditoInternacional"
+import tCreditoInternacionalRutas from "./rutas/t-creditoInternacional"
 
 const key = require('./environment/environment')
 
@@ -54,7 +54,7 @@ mongoose.connect(
 server.app.use(express.static(path.join((__dirname + '/public'))))
 server.app.use('/debito', tDebitoRutas)
 server.app.use('/credito', tCreditoRutas)
-server.app.use('/credito-internacional', tCreditoRutasInternacional)
+server.app.use('/internacional', tCreditoInternacionalRutas)
 
 //Levantar servidor
 server.start(() => console.log(`Hola, estoy en el puerto ${server.port}`))

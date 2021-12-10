@@ -40,6 +40,9 @@ const tCreditoShema = new mongoose_1.Schema({
     },
     identificador: {
         type: String
+    },
+    nacional: {
+        type: Boolean
     }
 });
 tCreditoShema.pre('save', function (next) {

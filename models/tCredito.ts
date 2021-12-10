@@ -40,6 +40,9 @@ const tCreditoShema = new Schema({
     },
     identificador: {
         type: String
+    },
+    nacional: {
+        type: Boolean
     }
 })
 

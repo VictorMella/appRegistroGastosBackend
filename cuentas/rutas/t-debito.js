@@ -47,8 +47,8 @@ tDebitoRutas.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* 
     const totalRegistrosDebito = yield tDebito_1.TDebito.find({ activo: true, mes: req.query.mes, anio: req.query.anio })
         .exec();
     res.json({
-        ok: true,
-        mensaje: '',
+        ok: totalRegistrosDebito.length ? true : false,
+        mensaje: totalRegistrosDebito.length ? '' : 'Busqueda sin resultados',
         data: [{
                 pagina,
                 cantidadRegistros: registrosTDebito.length,

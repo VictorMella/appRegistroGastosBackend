@@ -43,6 +43,6 @@ mongoose_1.default.connect('mongodb://localhost:27017/gastosBD', options);
 server.app.use(express_1.default.static(path_1.default.join((__dirname + '/public'))));
 server.app.use('/debito', t_debito_1.default);
 server.app.use('/credito', t_creditoNacional_1.default);
-server.app.use('/credito-internacional', t_creditoInternacional_1.default);
+server.app.use('/internacional', t_creditoInternacional_1.default);
 //Levantar servidor
 server.start(() => console.log(`Hola, estoy en el puerto ${server.port}`));
