@@ -57,8 +57,8 @@ tCreditoRutas.get('/', async (req: any, res: Response) => {
 // // Años con registros
 tCreditoRutas.get('/anio', async (req: any, res: Response) => {
     const añosConRegistros = await TCredito.find({ activo: true, nacional: req.query.registrosNacionales })
-        .sort({ anio: -1 }) // Ordenar lista
-        .exec()
+    .sort({ anio: -1 }) // Ordenar lista
+    .exec()
 
     res.json({
         ok: true,
