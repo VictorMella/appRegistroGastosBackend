@@ -11,7 +11,6 @@ const express_1 = __importDefault(require("express"));
 const path_1 = __importDefault(require("path"));
 const t_debito_1 = __importDefault(require("./rutas/t-debito"));
 const t_creditoNacional_1 = __importDefault(require("./rutas/t-creditoNacional"));
-const t_creditoInternacional_1 = __importDefault(require("./rutas/t-creditoInternacional"));
 const key = require('./environment/environment');
 const server = new server_1.default;
 //BODY PARSER
@@ -43,6 +42,5 @@ mongoose_1.default.connect('mongodb://localhost:27017/gastosBD', options);
 server.app.use(express_1.default.static(path_1.default.join((__dirname + '/public'))));
 server.app.use('/debito', t_debito_1.default);
 server.app.use('/credito', t_creditoNacional_1.default);
-server.app.use('/internacional', t_creditoInternacional_1.default);
 //Levantar servidor
 server.start(() => console.log(`Hola, estoy en el puerto ${server.port}`));
