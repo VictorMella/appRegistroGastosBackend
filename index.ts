@@ -21,19 +21,19 @@ server.app.use(bodyParser.json())
 // CORS
 server.app.use(cors({ origin: true, credentials: true }))
 
-server.app.use((req, res, next) => {
+// server.app.use((req, res, next) => {
 
-    // Dominio que tengan acceso (ej. 'http://example.com')
-    res.setHeader('Access-Control-Allow-Origin', '*')
+//     // Dominio que tengan acceso (ej. 'http://example.com')
+//     res.setHeader('Access-Control-Allow-Origin', '*')
 
-    // Metodos de solicitud que deseas permitir
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE')
+//     // Metodos de solicitud que deseas permitir
+//     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE')
 
-    // Encabecedados que permites (ej. 'X-Requested-With,content-type')
-    res.setHeader('Access-Control-Allow-Headers', '*')
+//     // Encabecedados que permites (ej. 'X-Requested-With,content-type')
+//     res.setHeader('Access-Control-Allow-Headers', '*')
 
-    next()
-})
+//     next()
+// })
 
 const options = {
     useNewUrlParser: true,
