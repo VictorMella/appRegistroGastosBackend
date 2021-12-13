@@ -44,7 +44,7 @@ const options = {
 //     mongoDB = 'mongodb://localhost:27017/gastosBD'
 // }
 mongoose_1.default.Promise = global.Promise;
-mongoose_1.default.connect('mongodb://localhost:27017/gastosBD', options);
+mongoose_1.default.connect(server.db, options);
 //Rutas del proyecto
 server.app.use(express_1.default.static(path_1.default.join((__dirname + '/public'))));
 server.app.use('/debito', t_debito_1.default);
