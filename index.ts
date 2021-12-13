@@ -35,10 +35,14 @@ server.app.use((req, res, next) => {
     next()
 })
 
-const options: IConnectOptions = {
-    useUnifiedTopology: true,
+const options = {
     useNewUrlParser: true,
-    useCreateIndex: true
+    useUnifiedTopology: true,
+    autoIndex: false, // Don't build indexes
+    serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
+    socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
+    family: 4, // Use IPv4, skip trying IPv6
+    driverInfo: { name: 'Mongoose', version: '6.0.12' }
 }
 
 //CONECTAR BD
@@ -48,6 +52,7 @@ const options: IConnectOptions = {
 // } else {
 //     mongoDB = 'mongodb://localhost:27017/gastosBD'
 // }
+mongoose.Promise = global.Promise;
 mongoose.connect(
     'mongodb://localhost:27017/gastosBD', options)
 

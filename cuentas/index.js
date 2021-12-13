@@ -28,7 +28,13 @@ server.app.use((req, res, next) => {
     next();
 });
 const options = {
-    useNewUrlParser: true
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    autoIndex: false,
+    serverSelectionTimeoutMS: 5000,
+    socketTimeoutMS: 45000,
+    family: 4,
+    driverInfo: { name: 'Mongoose', version: '6.0.12' }
 };
 //CONECTAR BD
 // let mongoDB: string
@@ -37,6 +43,7 @@ const options = {
 // } else {
 //     mongoDB = 'mongodb://localhost:27017/gastosBD'
 // }
+mongoose_1.default.Promise = global.Promise;
 mongoose_1.default.connect('mongodb://localhost:27017/gastosBD', options);
 //Rutas del proyecto
 server.app.use(express_1.default.static(path_1.default.join((__dirname + '/public'))));
