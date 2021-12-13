@@ -54,7 +54,7 @@ tDebitoRutas.get('/', async (req: any, res: Response) => {
 })
 
 // Años con registros
-tDebitoRutas.get('/anio', async (req: any, res: Response) => {
+tDebitoRutas.get('/anio', async (req: any, res: Response, next) => {
     try {
         const añosConRegistros = await TDebito.find({ activo: true })
             .sort({ anio: -1 }) // Ordenar lista    
@@ -66,11 +66,7 @@ tDebitoRutas.get('/anio', async (req: any, res: Response) => {
             data: [... new Set(añosConRegistros.map(item => item.anio))]
         })
     } catch (err) {
-        return res.json({
-            ok: false,
-            mensaje: 'Datos incorrectos',
-            data: []
-        })
+        next(err)
     }
  
 })

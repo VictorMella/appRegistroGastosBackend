@@ -49,7 +49,7 @@ const options: IConnectOptions = {
 //     mongoDB = 'mongodb://localhost:27017/gastosBD'
 // }
 mongoose.connect(
-    'mongodb://127.0.0.1:27017/gastosBD', options)
+    'mongodb://localhost:27017/gastosBD', options)
 
 //Rutas del proyecto
 server.app.use(express.static(path.join((__dirname + '/public'))))
