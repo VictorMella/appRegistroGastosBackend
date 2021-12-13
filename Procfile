@@ -1,2 +1,2 @@
-web: node cuentas/index.js
+worker: node cuentas/index.js
 
