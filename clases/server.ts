@@ -1,5 +1,5 @@
 import express from 'express'
-const serverport: number = 3000 || Number(process.env.PORT) || 3000
+const serverport: number = Number(process.env.PORT) || 3000
 const db = 'mongodb+srv://AdminMella:carola7810@cluster0.09jiw.mongodb.net/gastosBD?retryWrites=true&w=majority' || 'mongodb://localhost:27017/gastosBD'
 //mongodb+srv://AdminMella:carola7810@cluster0.09jiw.mongodb.net/gastosBD
 
