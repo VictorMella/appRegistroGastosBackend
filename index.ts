@@ -52,7 +52,7 @@ const options = {
 // } else {
 //     mongoDB = 'mongodb://localhost:27017/gastosBD'
 // }
-mongoose.Promise = global.Promise;
+mongoose.Promise = global.Promise
 mongoose.connect(
     server.db, options)
 

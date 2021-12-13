@@ -1,7 +1,7 @@
 import express from 'express'
 const serverport: number = 3000 || Number(process.env.PORT) || 3000
-const db = process.env.MONGODB_URI || 'mongodb://localhost:27017/gastosBD'
-
+const db = 'mongodb+srv://AdminMella:carola7810@cluster0.09jiw.mongodb.net/gastosBD' || 'mongodb://localhost:27017/gastosBD'
+//mongodb+srv://AdminMella:carola7810@cluster0.09jiw.mongodb.net/gastosBD
 export default class Server {
     public app: express.Application
     public port: number = 3000
