@@ -71,7 +71,11 @@ tDebitoRutas.get('/anio', (req, res) => __awaiter(void 0, void 0, void 0, functi
         });
     }
     catch (err) {
-        next(err);
+        return res.json({
+            ok: false,
+            mensaje: 'Datos incorrectos',
+            data: []
+        });
     }
 }));
 // ACTUALIZAR 

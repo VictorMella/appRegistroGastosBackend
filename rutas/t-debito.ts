@@ -66,7 +66,11 @@ tDebitoRutas.get('/anio', async (req: any, res: Response) => {
             data: [... new Set(añosConRegistros.map(item => item.anio))]
         })
     } catch (err) {
-        next(err)
+        return res.json({
+            ok: false,
+            mensaje: 'Datos incorrectos',
+            data: []
+        })
     }
  
 })
