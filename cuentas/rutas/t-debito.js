@@ -46,6 +46,8 @@ tDebitoRutas.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* 
         .exec();
     const totalRegistrosDebito = yield tDebito_1.TDebito.find({ activo: true, mes: req.query.mes, anio: req.query.anio })
         .exec();
+    const totalMontoMesDebito = yield tDebito_1.TDebito.find({ activo: true, mes: req.query.mes, anio: req.query.anio })
+        .exec();
     res.json({
         ok: totalRegistrosDebito.length ? true : false,
         mensaje: totalRegistrosDebito.length ? '' : 'Busqueda sin resultados',
@@ -55,6 +57,7 @@ tDebitoRutas.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* 
                 registrosPorPagina: registrosPorPagina,
                 totalRegistros: totalRegistrosDebito.length,
                 registrosTDebito,
+                totalMontoMes: totalMontoMesDebito.reduce((acc, curr) => acc + curr.monto, 0)
             }]
     });
 }));

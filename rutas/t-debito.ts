@@ -39,6 +39,8 @@ tDebitoRutas.get('/', async (req: any, res: Response) => {
         .exec()
     const totalRegistrosDebito = await TDebito.find({ activo: true, mes: req.query.mes, anio: req.query.anio })
         .exec()
+    const totalMontoMesDebito = await TDebito.find({ activo: true, mes: req.query.mes, anio: req.query.anio })
+        .exec()
 
     res.json({
         ok: totalRegistrosDebito.length ? true : false,
@@ -49,6 +51,7 @@ tDebitoRutas.get('/', async (req: any, res: Response) => {
             registrosPorPagina: registrosPorPagina,
             totalRegistros: totalRegistrosDebito.length,
             registrosTDebito,
+            totalMontoMes: totalMontoMesDebito.reduce((acc, curr) => acc + curr.monto, 0)
         }]
     })
 })

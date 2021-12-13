@@ -45,6 +45,8 @@ tCreditoRutas.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function*
         .exec();
     const totalRegistrosCredito = yield tCredito_1.TCredito.find({ activo: true, mes: req.query.mes, anio: req.query.anio, nacional: req.query.registrosNacionales })
         .exec();
+    const totalMontoMesCredito = yield tCredito_1.TCredito.find({ activo: true, mes: req.query.mes, anio: req.query.anio, nacional: req.query.registrosNacionales })
+        .exec();
     res.json({
         ok: totalRegistrosCredito.length ? true : false,
         mensaje: totalRegistrosCredito.length ? '' : 'Busqueda sin resultados',
@@ -54,6 +56,7 @@ tCreditoRutas.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function*
                 registrosPorPagina: registrosPorPagina,
                 totalRegistros: totalRegistrosCredito.length,
                 registrosTCredito,
+                totalMontoMes: totalMontoMesCredito.reduce((acc, curr) => acc + curr.monto, 0)
             }]
     });
 }));
