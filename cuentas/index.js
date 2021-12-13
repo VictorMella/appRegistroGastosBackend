@@ -11,22 +11,12 @@ const express_1 = __importDefault(require("express"));
 const path_1 = __importDefault(require("path"));
 const t_debito_1 = __importDefault(require("./rutas/t-debito"));
 const t_creditoNacional_1 = __importDefault(require("./rutas/t-creditoNacional"));
-const key = require('./environment/environment');
 const server = new server_1.default;
 //BODY PARSER
 server.app.use(body_parser_1.default.urlencoded({ extended: true }));
 server.app.use(body_parser_1.default.json());
 // CORS
 server.app.use(cors_1.default({ origin: true, credentials: true }));
-// server.app.use((req, res, next) => {
-//     // Dominio que tengan acceso (ej. 'http://example.com')
-//     res.setHeader('Access-Control-Allow-Origin', '*')
-//     // Metodos de solicitud que deseas permitir
-//     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE')
-//     // Encabecedados que permites (ej. 'X-Requested-With,content-type')
-//     res.setHeader('Access-Control-Allow-Headers', '*')
-//     next()
-// })
 const options = {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -36,13 +26,6 @@ const options = {
     family: 4,
     driverInfo: { name: 'Mongoose', version: '6.0.12' }
 };
-//CONECTAR BD
-// let mongoDB: string
-// if (process.env && process.env.NODE_ENV === 'production') {
-//     mongoDB = `mongodb+srv://AdminRegister:${key}@registrocuentas.09jiw.mongodb.nett/gastosBD`
-// } else {
-//     mongoDB = 'mongodb://localhost:27017/gastosBD'
-// }
 mongoose_1.default.Promise = global.Promise;
 mongoose_1.default.connect(server.db, options);
 //Rutas del proyecto
