@@ -34,7 +34,7 @@ mongoose.connect(
     server.db, options)
 
 //Rutas del proyecto
-server.app.use(express.static(path.join((__dirname + '/public'))))
+// server.app.use(express.static(path.join((__dirname + '/public'))))
 server.app.use('/debito', tDebitoRutas)
 server.app.use('/credito', tCreditoRutas)
 

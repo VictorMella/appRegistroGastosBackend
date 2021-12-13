@@ -7,8 +7,6 @@ const body_parser_1 = __importDefault(require("body-parser"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const server_1 = __importDefault(require("./clases/server"));
 const cors_1 = __importDefault(require("cors"));
-const express_1 = __importDefault(require("express"));
-const path_1 = __importDefault(require("path"));
 const t_debito_1 = __importDefault(require("./rutas/t-debito"));
 const t_creditoNacional_1 = __importDefault(require("./rutas/t-creditoNacional"));
 const server = new server_1.default;
@@ -29,7 +27,7 @@ const options = {
 mongoose_1.default.Promise = global.Promise;
 mongoose_1.default.connect(server.db, options);
 //Rutas del proyecto
-server.app.use(express_1.default.static(path_1.default.join((__dirname + '/public'))));
+// server.app.use(express.static(path.join((__dirname + '/public'))))
 server.app.use('/debito', t_debito_1.default);
 server.app.use('/credito', t_creditoNacional_1.default);
 //Levantar servidor

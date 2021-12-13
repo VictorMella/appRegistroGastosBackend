@@ -52,3 +52,5 @@ cypress/screenshots/*
 
 
 debug.log
+
+config.ts
