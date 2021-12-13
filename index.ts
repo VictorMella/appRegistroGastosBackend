@@ -36,7 +36,9 @@ server.app.use((req, res, next) => {
 })
 
 const options: IConnectOptions = {
-    useNewUrlParser: true
+    useUnifiedTopology: true,
+    useNewUrlParser: true,
+    useCreateIndex: true
 }
 
 //CONECTAR BD
