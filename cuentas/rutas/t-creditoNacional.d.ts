@@ -1,2 +1,2 @@
-declare const tCreditoRutas: any;
+declare const tCreditoRutas: import("express-serve-static-core").Router;
 export default tCreditoRutas;

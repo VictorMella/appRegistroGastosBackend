@@ -40,7 +40,7 @@ tCreditoRutas.get('/', async (req: any, res: Response) => {
         .exec()
     const totalRegistrosCredito = await TCredito.find({ activo: true, mes: req.query.mes, anio: req.query.anio, nacional: req.query.registrosNacionales })
         .exec()
-    
+
     const totalMontoMesCredito = await TCredito.find({ activo: true, mes: req.query.mes, anio: req.query.anio, nacional: req.query.registrosNacionales })
         .exec()
 

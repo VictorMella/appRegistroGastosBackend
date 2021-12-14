@@ -4,11 +4,11 @@ import Server from "./clases/server"
 import cors from 'cors'
 import express from 'express'
 import path from 'path'
-
 import tDebitoRutas from "./rutas/t-debito"
-
-import { IConnectOptions } from "./interfaces/i-conecctionOptions.interface"
 import tCreditoRutas from "./rutas/t-creditoNacional"
+import auth from "./rutas/auth"
+import usuario from "./rutas/usuario"
+import { IConnectOptions } from "./interfaces/i-conecctionOptions.interface"
 
 const server = new Server
 
@@ -34,7 +34,9 @@ mongoose.connect(
     server.db, options)
 
 //Rutas del proyecto
-// server.app.use(express.static(path.join((__dirname + '/public'))))
+server.app.use(express.static(path.join((__dirname + '/public'))))
+server.app.use('/auth', auth)
+server.app.use('/usuario', usuario)
 server.app.use('/debito', tDebitoRutas)
 server.app.use('/credito', tCreditoRutas)
 
