@@ -9,8 +9,8 @@ class Server {
     constructor() {
         this.port = 3000;
         this.app = express_1.default();
-        this.port = config_1.serverport;
-        this.db = config_1.db;
+        this.port = config_1.config.serverport;
+        this.db = config_1.config.db;
     }
     start(res) {
         this.app.listen(this.port, res);

@@ -19,6 +19,7 @@
     "request": "^2.88.2",
     "bcryptjs": "^2.4.3",
     "dotenv": "^8.2.0",
+    "jsonwebtoken": "^8.5.1",
     "express-validator": "^6.9.2"
   },
   "devDependencies": {

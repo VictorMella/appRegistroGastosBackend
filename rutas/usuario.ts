@@ -2,15 +2,17 @@ import { Router, Request, Response } from "express"
 import { check } from 'express-validator'
 import { cantidadUsuarios, emailExiste, existeUsuarioPorId } from "../helpers/db-validators"
 import { validarCampos } from "../middelwares/validar-campos"
+import { validarJWT } from "../middelwares/validar-jwt"
 import { Usuario } from "../models/usuario"
 
 const bcryptjs = require('bcryptjs')
 const usuario = Router()
 
 usuario.post('/create', [
-    check('id', 'No es un ID válido').isMongoId(),
-    check('id').custom(existeUsuarioPorId),
-    check('correo').custom(emailExiste),
+    check('nombre', 'El nombre es obligatorio').not().isEmpty(),
+    check('password', 'El password debe de ser más de 6 letras').isLength({ min: 6 }),
+    check('correo', 'El correo no es válido').isEmail(),
+    check('correo').custom( emailExiste ),
     validarCampos
 ], async (req: Request, res: Response) => {
     try {
@@ -53,20 +55,23 @@ usuario.post('/edit', [
     check('nombre', 'El nombre es obligatorio').not().isEmpty(),
     check('password', 'El password debe de ser más de 6 letras').isLength({ min: 6 }),
     check('correo', 'El correo no es válido').isEmail(),
+    check('uid', 'No es un ID válido').isMongoId(),
+    check('uid').custom( existeUsuarioPorId ),
     check('correo').custom(emailExiste),
     validarCampos
 ], (req: Request, res: Response) => {
     try {
-        const { _id, password, google, correo, ...resto } = req.body;
-
+        const { uid, password, google, correo, ...resto } = req.body;
+    console.log(req.body)
         if (password) {
             // Encriptar la contraseña
             const salt = bcryptjs.genSaltSync()
             resto.password = bcryptjs.hashSync(password, salt)
+            resto.correo = correo
         }
 
         // Guardar en BD
-        Usuario.findByIdAndUpdate(_id, resto, { new: true }, (err, usuarioEditado) => {
+        Usuario.findByIdAndUpdate(uid, resto, { new: true }, (err, usuarioEditado) => {
             if (err) throw err
             if (!usuarioEditado) {
                 return res.status(400).json({
@@ -103,6 +108,33 @@ usuario.get('/', async(req: Request, res: Response) => {
             mensaje: 'Algo salio mal'
         })
     }
+})
+
+usuario.post('/delete', [
+    validarJWT,
+    check('uid', 'No es un ID válido').isMongoId(),
+    check('uid').custom( existeUsuarioPorId ),
+    validarCampos
+],(req: Request, res: Response) => {
+    const payload = {
+        activo: false,
+        id: req.body.uid
+    }
+    Usuario.findByIdAndUpdate(payload.id, payload, { new: true }, (err, usuarioBorrado) => {
+        if (err) throw err
+        if (!usuarioBorrado) {
+            return res.json({
+                ok: false,
+                mensaje: 'Datos incorrectos',
+                data: []
+            })
+        }
+        res.json({
+            ok: true,
+            mensaje: 'Registro eliminado correctamente',
+            data: [usuarioBorrado]
+        })
+    })
 })
 
 export default usuario
