@@ -1,5 +1,5 @@
 import express from 'express'
-import { db, serverport } from '../config'
+import { config } from '../config'
 export default class Server {
     public app: express.Application
     public port: number = 3000
@@ -7,8 +7,8 @@ export default class Server {
 
     constructor() {
         this.app = express()
-        this.port = serverport
-        this.db = db
+        this.port = config.serverport
+        this.db = config.db
     }
 
     start(res: any) {

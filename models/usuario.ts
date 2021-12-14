@@ -31,6 +31,12 @@ const UsuarioSchema = new Schema({
     },
 });
 
+UsuarioSchema.methods.toJSON = function() {
+    const { __v, password, _id, ...usuario  } = this.toObject();
+    usuario.uid = _id;
+    return usuario;
+}
+
 UsuarioSchema.pre<IUsuario>('save', function (next) {
     this.created = new Date()
     this.idUsuarioCreacion = 1

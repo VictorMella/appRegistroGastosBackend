@@ -24,12 +24,14 @@ const express_1 = require("express");
 const express_validator_1 = require("express-validator");
 const db_validators_1 = require("../helpers/db-validators");
 const validar_campos_1 = require("../middelwares/validar-campos");
+const validar_jwt_1 = require("../middelwares/validar-jwt");
 const usuario_1 = require("../models/usuario");
 const bcryptjs = require('bcryptjs');
 const usuario = express_1.Router();
 usuario.post('/create', [
-    express_validator_1.check('id', 'No es un ID válido').isMongoId(),
-    express_validator_1.check('id').custom(db_validators_1.existeUsuarioPorId),
+    express_validator_1.check('nombre', 'El nombre es obligatorio').not().isEmpty(),
+    express_validator_1.check('password', 'El password debe de ser más de 6 letras').isLength({ min: 6 }),
+    express_validator_1.check('correo', 'El correo no es válido').isEmail(),
     express_validator_1.check('correo').custom(db_validators_1.emailExiste),
     validar_campos_1.validarCampos
 ], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -69,18 +71,22 @@ usuario.post('/edit', [
     express_validator_1.check('nombre', 'El nombre es obligatorio').not().isEmpty(),
     express_validator_1.check('password', 'El password debe de ser más de 6 letras').isLength({ min: 6 }),
     express_validator_1.check('correo', 'El correo no es válido').isEmail(),
+    express_validator_1.check('uid', 'No es un ID válido').isMongoId(),
+    express_validator_1.check('uid').custom(db_validators_1.existeUsuarioPorId),
     express_validator_1.check('correo').custom(db_validators_1.emailExiste),
     validar_campos_1.validarCampos
 ], (req, res) => {
     try {
-        const _a = req.body, { _id, password, google, correo } = _a, resto = __rest(_a, ["_id", "password", "google", "correo"]);
+        const _a = req.body, { uid, password, google, correo } = _a, resto = __rest(_a, ["uid", "password", "google", "correo"]);
+        console.log(req.body);
         if (password) {
             // Encriptar la contraseña
             const salt = bcryptjs.genSaltSync();
             resto.password = bcryptjs.hashSync(password, salt);
+            resto.correo = correo;
         }
         // Guardar en BD
-        usuario_1.Usuario.findByIdAndUpdate(_id, resto, { new: true }, (err, usuarioEditado) => {
+        usuario_1.Usuario.findByIdAndUpdate(uid, resto, { new: true }, (err, usuarioEditado) => {
             if (err)
                 throw err;
             if (!usuarioEditado) {
@@ -120,4 +126,31 @@ usuario.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
     }
 }));
+usuario.post('/delete', [
+    validar_jwt_1.validarJWT,
+    express_validator_1.check('uid', 'No es un ID válido').isMongoId(),
+    express_validator_1.check('uid').custom(db_validators_1.existeUsuarioPorId),
+    validar_campos_1.validarCampos
+], (req, res) => {
+    const payload = {
+        activo: false,
+        id: req.body.uid
+    };
+    usuario_1.Usuario.findByIdAndUpdate(payload.id, payload, { new: true }, (err, usuarioBorrado) => {
+        if (err)
+            throw err;
+        if (!usuarioBorrado) {
+            return res.json({
+                ok: false,
+                mensaje: 'Datos incorrectos',
+                data: []
+            });
+        }
+        res.json({
+            ok: true,
+            mensaje: 'Registro eliminado correctamente',
+            data: [usuarioBorrado]
+        });
+    });
+});
 exports.default = usuario;
