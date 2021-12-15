@@ -17,7 +17,8 @@ exports.validarJWT = (req = express_1.request, res = express_1.response, next) =
     const token = req.header('appToken');
     if (!token) {
         return res.status(401).json({
-            msg: 'No hay token en la petición'
+            ok: false,
+            mensaje: 'No hay token en la petición'
         });
     }
     try {
@@ -26,13 +27,15 @@ exports.validarJWT = (req = express_1.request, res = express_1.response, next) =
         const usuario = yield usuario_1.Usuario.findById(uid);
         if (!usuario) {
             return res.status(401).json({
-                msg: 'Token no válido - usuario no existe DB'
+                ok: false,
+                mensaje: 'Token no válido - usuario no existe DB'
             });
         }
         // Verificar si el uid tiene estado true
         if (!usuario.activo) {
             return res.status(401).json({
-                msg: 'Token no válido - usuario con estado: false'
+                ok: false,
+                mensaje: 'Token no válido - usuario con estado: false'
             });
         }
         req.usuario = usuario;
@@ -41,7 +44,8 @@ exports.validarJWT = (req = express_1.request, res = express_1.response, next) =
     catch (error) {
         console.log(error);
         res.status(401).json({
-            msg: 'Token no válido'
+            ok: false,
+            mensaje: 'Token no válido'
         });
     }
 });

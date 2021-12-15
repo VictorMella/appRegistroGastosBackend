@@ -14,6 +14,7 @@ const express_validator_1 = require("express-validator");
 const validar_campos_1 = require("../middelwares/validar-campos");
 const usuario_1 = require("../models/usuario");
 const generar_jwt_1 = require("../helpers/generar-jwt");
+const validar_jwt_1 = require("../middelwares/validar-jwt");
 const bcryptjs = require('bcryptjs');
 const auth = express_1.Router();
 auth.post('/login', [
@@ -27,35 +28,60 @@ auth.post('/login', [
         const usuario = yield usuario_1.Usuario.findOne({ correo });
         if (!usuario) {
             return res.status(400).json({
-                mensaje: 'Usuario / password no son correctos'
+                ok: false,
+                mensaje: 'No existe un usuario asociado a ese correo'
             });
         }
         //Verificar si el usuario esta activo
         if (!usuario.activo) {
             return res.status(400).json({
-                mensaje: 'Usuario / password no son correctos'
+                ok: false,
+                mensaje: 'El usuario seencuentra inactivo'
             });
         }
         //Verificar la contraseña
         const validPass = bcryptjs.compareSync(password, usuario.password);
         if (!validPass) {
             return res.status(400).json({
-                mensaje: 'Usuario / password no son correctos'
+                ok: false,
+                mensaje: 'La contraseña no es correcta'
             });
         }
         //Generar JWT
         const token = yield generar_jwt_1.generarJWT(usuario.id);
         res.json({
-            msg: 'LoginOk',
-            usuario,
-            token
+            ok: true,
+            mensaje: '',
+            data: {
+                usuario,
+                token
+            }
         });
     }
     catch (error) {
         console.log(error);
         return res.status(400).json({
+            ok: false,
             mensaje: 'Algo salio mal'
         });
     }
+}));
+auth.get('/renew', [
+    validar_jwt_1.validarJWT
+], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    console.log(req.usuario);
+    const { _id } = req.usuario;
+    // Leer la base de datos
+    const dbUser = yield usuario_1.Usuario.findById(_id);
+    // Generar el JWT
+    const token = yield generar_jwt_1.generarJWT(_id);
+    return res.json({
+        ok: true,
+        mensaje: '',
+        data: {
+            dbUser,
+            token
+        }
+    });
 }));
 exports.default = auth;
