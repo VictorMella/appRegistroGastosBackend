@@ -49,7 +49,6 @@ const tCreditoShema = new Schema({
 
 tCreditoShema.pre<ITCredito>('save', function (next) {
     this.created = new Date()
-    this.idUsuarioCreacion = 1
     this.activo = true
     next()
 })

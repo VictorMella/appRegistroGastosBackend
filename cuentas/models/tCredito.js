@@ -47,7 +47,6 @@ const tCreditoShema = new mongoose_1.Schema({
 });
 tCreditoShema.pre('save', function (next) {
     this.created = new Date();
-    this.idUsuarioCreacion = 1;
     this.activo = true;
     next();
 });

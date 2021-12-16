@@ -15,6 +15,7 @@ const tDebitoRutas = express_1.Router();
 //Crear registro
 tDebitoRutas.post('/crear-registro', (req, res) => {
     let body = req.body;
+    console.log(body);
     body.mes = parseInt(body.fechaCompra.split('-')[1]);
     body.anio = parseInt(body.fechaCompra.split('-')[0]);
     tDebito_1.TDebito.create(body)
@@ -39,14 +40,14 @@ tDebitoRutas.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* 
     let saltar = pagina - 1;
     const registrosPorPagina = Number(req.query.registrosPorPagina) || 10;
     saltar = saltar * registrosPorPagina;
-    const registrosTDebito = yield tDebito_1.TDebito.find({ activo: true, mes: req.query.mes, anio: req.query.anio })
+    const registrosTDebito = yield tDebito_1.TDebito.find({ activo: true, mes: req.query.mes, anio: req.query.anio, idUsuarioCreacion: req.query.idUsuarioCreacion })
         .sort({ fechaCompra: -1 }) // Ordenar lista
         .skip(saltar) //Saltar registros
         .limit(registrosPorPagina) // Limit es para el número de usuarios que queremos obtener
         .exec();
-    const totalRegistrosDebito = yield tDebito_1.TDebito.find({ activo: true, mes: req.query.mes, anio: req.query.anio })
+    const totalRegistrosDebito = yield tDebito_1.TDebito.find({ activo: true, mes: req.query.mes, anio: req.query.anio, idUsuarioCreacion: req.query.idUsuarioCreacion })
         .exec();
-    const totalMontoMesDebito = yield tDebito_1.TDebito.find({ activo: true, mes: req.query.mes, anio: req.query.anio })
+    const totalMontoMesDebito = yield tDebito_1.TDebito.find({ activo: true, mes: req.query.mes, anio: req.query.anio, idUsuarioCreacion: req.query.idUsuarioCreacion })
         .exec();
     res.json({
         ok: totalRegistrosDebito.length ? true : false,
@@ -63,7 +64,7 @@ tDebitoRutas.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* 
 }));
 // Años con registros
 tDebitoRutas.get('/anio', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const añosConRegistros = yield tDebito_1.TDebito.find({ activo: true })
+    const añosConRegistros = yield tDebito_1.TDebito.find({ activo: true, idUsuarioCreacion: req.query.idUsuarioCreacion })
         .sort({ anio: -1 }) // Ordenar lista    
         .exec();
     res.json({

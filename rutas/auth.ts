@@ -56,7 +56,6 @@ auth.post('/login', [
             mensaje: 'Algo salio mal'
         })
     }
-
 })
 
 auth.get('/renew', [
