@@ -69,17 +69,16 @@ auth.post('/login', [
 auth.get('/renew', [
     validar_jwt_1.validarJWT
 ], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    console.log(req.usuario);
     const { _id } = req.usuario;
     // Leer la base de datos
-    const dbUser = yield usuario_1.Usuario.findById(_id);
+    const usuario = yield usuario_1.Usuario.findById(_id);
     // Generar el JWT
     const token = yield generar_jwt_1.generarJWT(_id);
     return res.json({
         ok: true,
         mensaje: '',
         data: {
-            dbUser,
+            usuario,
             token
         }
     });

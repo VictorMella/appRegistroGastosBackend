@@ -62,12 +62,10 @@ auth.post('/login', [
 auth.get('/renew', [
     validarJWT
 ], async (req: any, res: Response) => {
-    console.log(req.usuario)
     const { _id } = req.usuario
 
     // Leer la base de datos
-    const dbUser = await Usuario.findById(_id)
-
+    const usuario = await Usuario.findById(_id)
 
     // Generar el JWT
     const token = await generarJWT(_id)
@@ -76,7 +74,7 @@ auth.get('/renew', [
         ok: true,
         mensaje: '',
         data: {
-            dbUser,
+            usuario,
             token
         }
     })
