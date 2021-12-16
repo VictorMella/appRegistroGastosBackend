@@ -7,6 +7,7 @@ const tDebitoRutas = Router()
 //Crear registro
 tDebitoRutas.post('/crear-registro', (req: Request, res: Response) => {
     let body = req.body
+    console.log(body)
     body.mes = parseInt(body.fechaCompra.split('-')[1])
     body.anio = parseInt(body.fechaCompra.split('-')[0])
     TDebito.create(body)
@@ -32,14 +33,14 @@ tDebitoRutas.get('/', async (req: any, res: Response) => {
     let saltar = pagina - 1
     const registrosPorPagina = Number(req.query.registrosPorPagina) || 10
     saltar = saltar * registrosPorPagina
-    const registrosTDebito = await TDebito.find({ activo: true, mes: req.query.mes, anio: req.query.anio })
+    const registrosTDebito = await TDebito.find({ activo: true, mes: req.query.mes, anio: req.query.anio, idUsuarioCreacion: req.query.idUsuarioCreacion })
         .sort({ fechaCompra: -1 }) // Ordenar lista
         .skip(saltar) //Saltar registros
         .limit(registrosPorPagina) // Limit es para el número de usuarios que queremos obtener
         .exec()
-    const totalRegistrosDebito = await TDebito.find({ activo: true, mes: req.query.mes, anio: req.query.anio })
+    const totalRegistrosDebito = await TDebito.find({ activo: true, mes: req.query.mes, anio: req.query.anio, idUsuarioCreacion: req.query.idUsuarioCreacion })
         .exec()
-    const totalMontoMesDebito = await TDebito.find({ activo: true, mes: req.query.mes, anio: req.query.anio })
+    const totalMontoMesDebito = await TDebito.find({ activo: true, mes: req.query.mes, anio: req.query.anio, idUsuarioCreacion: req.query.idUsuarioCreacion })
         .exec()
 
     res.json({
@@ -58,7 +59,7 @@ tDebitoRutas.get('/', async (req: any, res: Response) => {
 
 // Años con registros
 tDebitoRutas.get('/anio', async (req: any, res: Response) => {
-    const añosConRegistros = await TDebito.find({ activo: true })
+    const añosConRegistros = await TDebito.find({ activo: true, idUsuarioCreacion: req.query.idUsuarioCreacion })
         .sort({ anio: -1 }) // Ordenar lista    
         .exec()
 

@@ -34,7 +34,6 @@ const tDebitoShema = new Schema({
 
 tDebitoShema.pre<ITDebito>('save', function (next) {
     this.created = new Date()
-    this.idUsuarioCreacion = 1
     this.activo = true
     next()
 })

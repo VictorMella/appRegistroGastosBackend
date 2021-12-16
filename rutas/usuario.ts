@@ -33,7 +33,7 @@ usuario.post('/create', [
         usuario.password = bcryptjs.hashSync(password, salt)
 
         //Crear identificador del usuario
-        usuario.identificador = await cantidadUsuarios()
+        usuario.identificador = await cantidadUsuarios()    
 
          // Generar el JWT
          const token = await generarJWT( usuario.id );
