@@ -23,6 +23,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const express_validator_1 = require("express-validator");
 const db_validators_1 = require("../helpers/db-validators");
+const generar_jwt_1 = require("../helpers/generar-jwt");
 const validar_campos_1 = require("../middelwares/validar-campos");
 const validar_jwt_1 = require("../middelwares/validar-jwt");
 const usuario_1 = require("../models/usuario");
@@ -32,24 +33,36 @@ usuario.post('/create', [
     express_validator_1.check('nombre', 'El nombre es obligatorio').not().isEmpty(),
     express_validator_1.check('password', 'El password debe de ser más de 6 letras').isLength({ min: 6 }),
     express_validator_1.check('correo', 'El correo no es válido').isEmail(),
-    express_validator_1.check('correo').custom(db_validators_1.emailExiste),
+    // check('correo').custom( emailExiste ),
     validar_campos_1.validarCampos
 ], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { nombre, correo, password } = req.body;
         const usuario = new usuario_1.Usuario({ nombre, correo, password });
+        //Verificar si el usuario existe
+        const usuarioExiste = yield usuario_1.Usuario.find({ correo, activo: true });
+        if (usuarioExiste.length > 0) {
+            return res.status(400).json({
+                ok: false,
+                mensaje: 'Existe un usuario activo asociado a ese correo'
+            });
+        }
         // Encriptar la contraseña
         const salt = bcryptjs.genSaltSync();
         usuario.password = bcryptjs.hashSync(password, salt);
         //Crear identificador del usuario
         usuario.identificador = yield db_validators_1.cantidadUsuarios();
+        // Generar el JWT
+        const token = yield generar_jwt_1.generarJWT(usuario.id);
         // Guardar en BD
         yield usuario_1.Usuario.create(usuario)
-            .then(user => {
+            .then(usuario => {
             res.json({
                 ok: true,
-                mensaje: `${user.nombre} Registro creado correctamente`,
-                data: [user]
+                mensaje: `${usuario.nombre} Registro creado correctamente`,
+                data: {
+                    token
+                }
             });
         })
             .catch(err => {
@@ -63,6 +76,7 @@ usuario.post('/create', [
     catch (error) {
         console.log(error);
         return res.status(400).json({
+            ok: false,
             mensaje: 'Algo salio mal'
         });
     }

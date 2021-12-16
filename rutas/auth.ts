@@ -27,7 +27,7 @@ auth.post('/login', [
         if (!usuario.activo) {
             return res.status(400).json({
                 ok: false,
-                mensaje: 'El usuario seencuentra inactivo'
+                mensaje: 'El usuario se encuentra inactivo'
             })
         }
         //Verificar la contraseña

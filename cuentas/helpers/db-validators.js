@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const usuario_1 = require("../models/usuario");
 exports.emailExiste = (correo = '') => __awaiter(void 0, void 0, void 0, function* () {
     // Verificar si el correo existe
-    const existeEmail = yield usuario_1.Usuario.findOne({ correo });
+    const existeEmail = yield usuario_1.Usuario.findOne({ correo, activo: true });
     if (existeEmail) {
         throw new Error(`El correo: ${correo}, ya está registrado`);
     }

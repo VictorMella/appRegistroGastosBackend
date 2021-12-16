@@ -3,7 +3,7 @@ import { Usuario } from "../models/usuario"
 export const emailExiste = async( correo = '' ) => {
 
     // Verificar si el correo existe
-    const existeEmail = await Usuario.findOne({ correo });
+    const existeEmail = await Usuario.findOne({ correo, activo: true });
     if ( existeEmail ) {
         throw new Error(`El correo: ${ correo }, ya está registrado`);
     }
