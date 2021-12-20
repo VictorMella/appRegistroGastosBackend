@@ -9,6 +9,7 @@ import tCreditoRutas from "./rutas/t-creditoNacional"
 import auth from "./rutas/auth"
 import usuario from "./rutas/usuario"
 import { IConnectOptions } from "./interfaces/i-conecctionOptions.interface"
+import otrosGastosRutas from "./rutas/otros-gastos"
 
 const server = new Server
 
@@ -39,6 +40,7 @@ server.app.use('/auth', auth)
 server.app.use('/usuario', usuario)
 server.app.use('/debito', tDebitoRutas)
 server.app.use('/credito', tCreditoRutas)
+server.app.use('/otros-gastos', otrosGastosRutas)
 
 
 //Levantar servidor
