@@ -65,7 +65,6 @@ otrosGastosRutas.get('/anio', async (req: any, res: Response) => {
     const añosConRegistros = await OtrosGastos.find({ activo: true, idUsuarioCreacion: req.query.idUsuarioCreacion })
         .sort({ anio: -1 }) // Ordenar lista
         .exec()
-
     res.json({
         ok: true,
         mensaje: '',
