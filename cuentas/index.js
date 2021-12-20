@@ -13,6 +13,7 @@ const t_debito_1 = __importDefault(require("./rutas/t-debito"));
 const t_creditoNacional_1 = __importDefault(require("./rutas/t-creditoNacional"));
 const auth_1 = __importDefault(require("./rutas/auth"));
 const usuario_1 = __importDefault(require("./rutas/usuario"));
+const otros_gastos_1 = __importDefault(require("./rutas/otros-gastos"));
 const server = new server_1.default;
 //BODY PARSER
 server.app.use(body_parser_1.default.urlencoded({ extended: true }));
@@ -36,5 +37,6 @@ server.app.use('/auth', auth_1.default);
 server.app.use('/usuario', usuario_1.default);
 server.app.use('/debito', t_debito_1.default);
 server.app.use('/credito', t_creditoNacional_1.default);
+server.app.use('/otros-gastos', otros_gastos_1.default);
 //Levantar servidor
 server.start(() => console.log(`Hola, estoy en el puerto ${server.port}`));

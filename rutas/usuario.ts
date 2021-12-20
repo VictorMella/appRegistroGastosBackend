@@ -13,7 +13,6 @@ usuario.post('/create', [
     check('nombre', 'El nombre es obligatorio').not().isEmpty(),
     check('password', 'El password debe de ser más de 6 letras').isLength({ min: 6 }),
     check('correo', 'El correo no es válido').isEmail(),
-    // check('correo').custom( emailExiste ),
     validarCampos
 ], async (req: Request, res: Response) => {
     try {

@@ -33,7 +33,6 @@ usuario.post('/create', [
     express_validator_1.check('nombre', 'El nombre es obligatorio').not().isEmpty(),
     express_validator_1.check('password', 'El password debe de ser más de 6 letras').isLength({ min: 6 }),
     express_validator_1.check('correo', 'El correo no es válido').isEmail(),
-    // check('correo').custom( emailExiste ),
     validar_campos_1.validarCampos
 ], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
