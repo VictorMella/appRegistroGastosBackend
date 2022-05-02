@@ -8,7 +8,6 @@ const otrosGastosRutas = Router()
 //Crear registro
 otrosGastosRutas.post('/crear-registro', (req: Request, res: Response) => {
     let body = req.body
-    console.log(body)
     body.mes = parseInt(body.fechaCompra.split('-')[1])
     body.anio = parseInt(body.fechaCompra.split('-')[0])
     OtrosGastos.create(body)

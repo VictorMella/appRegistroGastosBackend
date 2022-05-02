@@ -15,7 +15,6 @@ const otrosGastosRutas = (0, express_1.Router)();
 //Crear registro
 otrosGastosRutas.post('/crear-registro', (req, res) => {
     let body = req.body;
-    console.log(body);
     body.mes = parseInt(body.fechaCompra.split('-')[1]);
     body.anio = parseInt(body.fechaCompra.split('-')[0]);
     otros_gastos_1.OtrosGastos.create(body)
