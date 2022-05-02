@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const tCredito_1 = require("../models/tCredito");
 const moment = require('moment');
-const tCreditoRutas = express_1.Router();
+const tCreditoRutas = (0, express_1.Router)();
 //Crear registro
 tCreditoRutas.post('/crear-registro', (req, res) => {
     let body = formatPayloadLsCredito(req.body);
@@ -132,6 +132,7 @@ const formatPayloadLsCredito = (lsRegistro) => {
         lsRegistro.anio = parseInt(date.split('-')[0]);
         lsRegistro.identificador = identificador;
         lsRegistro.nCuota = 1;
+        lsRegistro.totalCompra = totalCompra;
         return lsRegistro;
     }
     if (lsRegistro.cuotas > 1) {
@@ -147,6 +148,7 @@ const formatPayloadLsCredito = (lsRegistro) => {
             lsRegistro.nCuota = contador + 1;
             lsRegistro.monto = Math.round(totalCompra / cuotas);
             lsRegistro.identificador = identificador;
+            lsRegistro.totalCompra = totalCompra;
             crearRegistros(lsRegistro);
             contador += 1;
         }

@@ -11,6 +11,7 @@ var __rest = (this && this.__rest) || function (s, e) {
     return t;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Usuario = void 0;
 const mongoose_1 = require("mongoose");
 const UsuarioSchema = new mongoose_1.Schema({
     created: {
@@ -51,4 +52,4 @@ UsuarioSchema.pre('save', function (next) {
     this.idUsuarioCreacion = 1;
     next();
 });
-exports.Usuario = mongoose_1.model('Usuario', UsuarioSchema);
+exports.Usuario = (0, mongoose_1.model)('Usuario', UsuarioSchema);

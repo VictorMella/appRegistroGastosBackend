@@ -9,11 +9,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.validarJWT = void 0;
 const express_1 = require("express");
 const usuario_1 = require("../models/usuario");
 const config_1 = require("../config");
 const jwt = require('jsonwebtoken');
-exports.validarJWT = (req = express_1.request, res = express_1.response, next) => __awaiter(void 0, void 0, void 0, function* () {
+const validarJWT = (req = express_1.request, res = express_1.response, next) => __awaiter(void 0, void 0, void 0, function* () {
     const token = req.header('appToken');
     if (!token) {
         return res.status(401).json({
@@ -49,3 +50,4 @@ exports.validarJWT = (req = express_1.request, res = express_1.response, next) =
         });
     }
 });
+exports.validarJWT = validarJWT;

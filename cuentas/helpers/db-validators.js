@@ -9,24 +9,28 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.cantidadUsuarios = exports.existeUsuarioPorId = exports.emailExiste = void 0;
 const usuario_1 = require("../models/usuario");
-exports.emailExiste = (correo = '') => __awaiter(void 0, void 0, void 0, function* () {
+const emailExiste = (correo = '') => __awaiter(void 0, void 0, void 0, function* () {
     // Verificar si el correo existe
     const existeEmail = yield usuario_1.Usuario.findOne({ correo, activo: true });
     if (existeEmail) {
         throw new Error(`El correo: ${correo}, ya está registrado`);
     }
 });
-exports.existeUsuarioPorId = (id) => __awaiter(void 0, void 0, void 0, function* () {
+exports.emailExiste = emailExiste;
+const existeUsuarioPorId = (id) => __awaiter(void 0, void 0, void 0, function* () {
     // Verificar si el correo existe
     const existeUsuario = yield usuario_1.Usuario.findById(id);
     if (!existeUsuario) {
         throw new Error(`El id no existe ${id}`);
     }
 });
-exports.cantidadUsuarios = () => __awaiter(void 0, void 0, void 0, function* () {
+exports.existeUsuarioPorId = existeUsuarioPorId;
+const cantidadUsuarios = () => __awaiter(void 0, void 0, void 0, function* () {
     // Verificar si el correo existe
     const totalRegistrosUsuario = yield usuario_1.Usuario.find({ activo: true })
         .exec();
     return totalRegistrosUsuario.length + 1;
 });
+exports.cantidadUsuarios = cantidadUsuarios;

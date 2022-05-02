@@ -16,10 +16,10 @@ const usuario_1 = require("../models/usuario");
 const generar_jwt_1 = require("../helpers/generar-jwt");
 const validar_jwt_1 = require("../middelwares/validar-jwt");
 const bcryptjs = require('bcryptjs');
-const auth = express_1.Router();
+const auth = (0, express_1.Router)();
 auth.post('/login', [
-    express_validator_1.check('correo', 'El correo es obligatorio').isEmail(),
-    express_validator_1.check('password', 'El password es obligatorio').not().isEmpty(),
+    (0, express_validator_1.check)('correo', 'El correo es obligatorio').isEmail(),
+    (0, express_validator_1.check)('password', 'El password es obligatorio').not().isEmpty(),
     validar_campos_1.validarCampos
 ], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { correo, password } = req.body;
@@ -48,7 +48,7 @@ auth.post('/login', [
             });
         }
         //Generar JWT
-        const token = yield generar_jwt_1.generarJWT(usuario.id);
+        const token = yield (0, generar_jwt_1.generarJWT)(usuario.id);
         res.json({
             ok: true,
             mensaje: '',
@@ -73,7 +73,7 @@ auth.get('/renew', [
     // Leer la base de datos
     const usuario = yield usuario_1.Usuario.findById(_id);
     // Generar el JWT
-    const token = yield generar_jwt_1.generarJWT(_id);
+    const token = yield (0, generar_jwt_1.generarJWT)(_id);
     return res.json({
         ok: true,
         mensaje: '',

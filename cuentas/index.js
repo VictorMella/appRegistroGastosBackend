@@ -19,7 +19,7 @@ const server = new server_1.default;
 server.app.use(body_parser_1.default.urlencoded({ extended: true }));
 server.app.use(body_parser_1.default.json());
 // CORS
-server.app.use(cors_1.default({ origin: true, credentials: true }));
+server.app.use((0, cors_1.default)({ origin: true, credentials: true }));
 const options = {
     useNewUrlParser: true,
     useUnifiedTopology: true,

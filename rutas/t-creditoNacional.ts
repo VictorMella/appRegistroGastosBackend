@@ -132,6 +132,7 @@ const formatPayloadLsCredito = (lsRegistro: ITCredito) => {
         lsRegistro.anio = parseInt(date.split('-')[0])
         lsRegistro.identificador = identificador
         lsRegistro.nCuota = 1
+        lsRegistro.totalCompra = totalCompra
         return lsRegistro
     }
     if (lsRegistro.cuotas > 1) {
@@ -147,6 +148,7 @@ const formatPayloadLsCredito = (lsRegistro: ITCredito) => {
             lsRegistro.nCuota = contador + 1
             lsRegistro.monto = Math.round(totalCompra / cuotas)
             lsRegistro.identificador = identificador
+            lsRegistro.totalCompra = totalCompra
             crearRegistros(lsRegistro)
             contador += 1
         }

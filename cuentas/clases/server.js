@@ -8,7 +8,7 @@ const config_1 = require("../config");
 class Server {
     constructor() {
         this.port = 3000;
-        this.app = express_1.default();
+        this.app = (0, express_1.default)();
         this.port = config_1.config.serverport;
         this.db = config_1.config.db;
     }

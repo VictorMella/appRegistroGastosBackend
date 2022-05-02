@@ -28,11 +28,11 @@ const validar_campos_1 = require("../middelwares/validar-campos");
 const validar_jwt_1 = require("../middelwares/validar-jwt");
 const usuario_1 = require("../models/usuario");
 const bcryptjs = require('bcryptjs');
-const usuario = express_1.Router();
+const usuario = (0, express_1.Router)();
 usuario.post('/create', [
-    express_validator_1.check('nombre', 'El nombre es obligatorio').not().isEmpty(),
-    express_validator_1.check('password', 'El password debe de ser más de 6 letras').isLength({ min: 6 }),
-    express_validator_1.check('correo', 'El correo no es válido').isEmail(),
+    (0, express_validator_1.check)('nombre', 'El nombre es obligatorio').not().isEmpty(),
+    (0, express_validator_1.check)('password', 'El password debe de ser más de 6 letras').isLength({ min: 6 }),
+    (0, express_validator_1.check)('correo', 'El correo no es válido').isEmail(),
     validar_campos_1.validarCampos
 ], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -50,9 +50,9 @@ usuario.post('/create', [
         const salt = bcryptjs.genSaltSync();
         usuario.password = bcryptjs.hashSync(password, salt);
         //Crear identificador del usuario
-        usuario.identificador = yield db_validators_1.cantidadUsuarios();
+        usuario.identificador = yield (0, db_validators_1.cantidadUsuarios)();
         // Generar el JWT
-        const token = yield generar_jwt_1.generarJWT(usuario.id);
+        const token = yield (0, generar_jwt_1.generarJWT)(usuario.id);
         // Guardar en BD
         yield usuario_1.Usuario.create(usuario)
             .then(usuario => {
@@ -81,12 +81,12 @@ usuario.post('/create', [
     }
 }));
 usuario.post('/edit', [
-    express_validator_1.check('nombre', 'El nombre es obligatorio').not().isEmpty(),
-    express_validator_1.check('password', 'El password debe de ser más de 6 letras').isLength({ min: 6 }),
-    express_validator_1.check('correo', 'El correo no es válido').isEmail(),
-    express_validator_1.check('uid', 'No es un ID válido').isMongoId(),
-    express_validator_1.check('uid').custom(db_validators_1.existeUsuarioPorId),
-    express_validator_1.check('correo').custom(db_validators_1.emailExiste),
+    (0, express_validator_1.check)('nombre', 'El nombre es obligatorio').not().isEmpty(),
+    (0, express_validator_1.check)('password', 'El password debe de ser más de 6 letras').isLength({ min: 6 }),
+    (0, express_validator_1.check)('correo', 'El correo no es válido').isEmail(),
+    (0, express_validator_1.check)('uid', 'No es un ID válido').isMongoId(),
+    (0, express_validator_1.check)('uid').custom(db_validators_1.existeUsuarioPorId),
+    (0, express_validator_1.check)('correo').custom(db_validators_1.emailExiste),
     validar_campos_1.validarCampos
 ], (req, res) => {
     try {
@@ -141,8 +141,8 @@ usuario.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 }));
 usuario.post('/delete', [
     validar_jwt_1.validarJWT,
-    express_validator_1.check('uid', 'No es un ID válido').isMongoId(),
-    express_validator_1.check('uid').custom(db_validators_1.existeUsuarioPorId),
+    (0, express_validator_1.check)('uid', 'No es un ID válido').isMongoId(),
+    (0, express_validator_1.check)('uid').custom(db_validators_1.existeUsuarioPorId),
     validar_campos_1.validarCampos
 ], (req, res) => {
     const payload = {

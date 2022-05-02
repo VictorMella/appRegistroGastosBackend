@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.OtrosGastos = void 0;
 const mongoose_1 = require("mongoose");
 const otrosShema = new mongoose_1.Schema({
     created: {
@@ -35,4 +36,4 @@ otrosShema.pre('save', function (next) {
     this.activo = true;
     next();
 });
-exports.OtrosGastos = mongoose_1.model('OtrosGastos', otrosShema);
+exports.OtrosGastos = (0, mongoose_1.model)('OtrosGastos', otrosShema);

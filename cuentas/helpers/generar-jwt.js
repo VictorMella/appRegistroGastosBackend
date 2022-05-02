@@ -1,8 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.generarJWT = void 0;
 const jwt = require('jsonwebtoken');
 const config_1 = require("../config");
-exports.generarJWT = (uid = '') => {
+const generarJWT = (uid = '') => {
     return new Promise((resolve, reject) => {
         const payload = { uid };
         jwt.sign(payload, config_1.config.SECRETORPRIVATEKEY, {
@@ -18,3 +19,4 @@ exports.generarJWT = (uid = '') => {
         });
     });
 };
+exports.generarJWT = generarJWT;

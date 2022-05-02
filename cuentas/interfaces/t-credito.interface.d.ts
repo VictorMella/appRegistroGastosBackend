@@ -14,4 +14,5 @@ export interface ITCredito {
     identificador: number | string;
     nCuota: number;
     nacional: boolean;
+    totalCompra: number;
 }

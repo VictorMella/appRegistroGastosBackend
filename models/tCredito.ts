@@ -8,6 +8,9 @@ const tCreditoShema = new Schema({
     fechaCompra: {
         type: Date
     },
+    totalCompra: {
+        type: Number
+    },
     monto: {
         type: Number
     },

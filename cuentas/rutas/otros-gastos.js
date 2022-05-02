@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const otros_gastos_1 = require("../models/otros-gastos");
-const otrosGastosRutas = express_1.Router();
+const otrosGastosRutas = (0, express_1.Router)();
 //Crear registro
 otrosGastosRutas.post('/crear-registro', (req, res) => {
     let body = req.body;
