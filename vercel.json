@@ -10,8 +10,8 @@
     ],
     "routes": [
       {
-        "src": "cuentas/(.*)",
-        "dest": "/cuentas/index.js"
+        "src": "/(.*)",
+        "dest": "/index.js"
       }
     ]
   }
