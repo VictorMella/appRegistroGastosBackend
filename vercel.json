@@ -1,7 +1,6 @@
 {
     "name": "api-cuentas",
     "version": 2,
-    "public": false,
     "builds": [
       {
         "src": "cuentas/index.js",
