@@ -14,7 +14,7 @@ const express_1 = require("express");
 const usuario_1 = require("../models/usuario");
 const config_1 = require("../config");
 const jwt = require('jsonwebtoken');
-const validarJWT = (req = express_1.request, res = express_1.response, next) => __awaiter(void 0, void 0, void 0, function* () {
+const validarJWT = (...args_1) => __awaiter(void 0, [...args_1], void 0, function* (req = express_1.request, res = express_1.response, next) {
     const token = req.header('appToken');
     if (!token) {
         return res.status(401).json({

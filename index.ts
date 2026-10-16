@@ -1,5 +1,4 @@
 import bodyParser from "body-parser"
-import mongoose from "mongoose"
 import Server from "./clases/server"
 import cors from 'cors'
 import express from 'express'
@@ -8,8 +7,8 @@ import tDebitoRutas from "./rutas/t-debito"
 import tCreditoRutas from "./rutas/t-creditoNacional"
 import auth from "./rutas/auth"
 import usuario from "./rutas/usuario"
-import { IConnectOptions } from "./interfaces/i-conecctionOptions.interface"
 import otrosGastosRutas from "./rutas/otros-gastos"
+import { conectarDB } from "./db/conectar-db"
 
 const server = new Server
 
@@ -20,28 +19,22 @@ server.app.use(bodyParser.json())
 // CORS
 server.app.use(cors({ origin: true, credentials: true }))
 
-const options: IConnectOptions = {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    autoIndex: false, // Don't build indexes
-    serverSelectionTimeoutMS: 5000, // Keep trying to send operations for 5 seconds
-    socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
-    family: 4, // Use IPv4, skip trying IPv6
-    driverInfo: { name: 'Mongoose', version: '6.0.12' }
+const iniciar = async () => {
+    await conectarDB()
+
+    //Rutas del proyecto
+    server.app.use(express.static(path.join((__dirname + '/public'))))
+    server.app.use('/auth', auth)
+    server.app.use('/usuario', usuario)
+    server.app.use('/debito', tDebitoRutas)
+    server.app.use('/credito', tCreditoRutas)
+    server.app.use('/otros-gastos', otrosGastosRutas)
+
+    //Levantar servidor
+    server.start(() => console.log(`Hola, estoy en el puerto ${server.port}`))
 }
 
-mongoose.Promise = global.Promise
-mongoose.connect(
-    server.db, options)
-
-//Rutas del proyecto
-server.app.use(express.static(path.join((__dirname + '/public'))))
-server.app.use('/auth', auth)
-server.app.use('/usuario', usuario)
-server.app.use('/debito', tDebitoRutas)
-server.app.use('/credito', tCreditoRutas)
-server.app.use('/otros-gastos', otrosGastosRutas)
-
-
-//Levantar servidor
-server.start(() => console.log(`Hola, estoy en el puerto ${server.port}`))
+iniciar().catch(err => {
+    console.error('No se pudo conectar a la base de datos', err)
+    process.exit(1)
+})

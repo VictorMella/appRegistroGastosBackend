@@ -11,7 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.cantidadUsuarios = exports.existeUsuarioPorId = exports.emailExiste = void 0;
 const usuario_1 = require("../models/usuario");
-const emailExiste = (correo = '') => __awaiter(void 0, void 0, void 0, function* () {
+const emailExiste = (...args_1) => __awaiter(void 0, [...args_1], void 0, function* (correo = '') {
     // Verificar si el correo existe
     const existeEmail = yield usuario_1.Usuario.findOne({ correo, activo: true });
     if (existeEmail) {
