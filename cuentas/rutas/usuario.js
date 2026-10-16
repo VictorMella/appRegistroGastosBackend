@@ -65,9 +65,10 @@ usuario.post('/create', [
             });
         })
             .catch(err => {
+            console.log(err);
             res.json({
                 ok: false,
-                mensaje: err,
+                mensaje: 'No se pudo crear el usuario',
                 data: []
             });
         });
@@ -81,6 +82,7 @@ usuario.post('/create', [
     }
 }));
 usuario.post('/edit', [
+    validar_jwt_1.validarJWT,
     (0, express_validator_1.check)('nombre', 'El nombre es obligatorio').not().isEmpty(),
     (0, express_validator_1.check)('password', 'El password debe de ser más de 6 letras').isLength({ min: 6 }),
     (0, express_validator_1.check)('correo', 'El correo no es válido').isEmail(),
@@ -90,8 +92,13 @@ usuario.post('/edit', [
     validar_campos_1.validarCampos
 ], (req, res) => {
     try {
+        if (req.body.uid !== String(req.usuario._id)) {
+            return res.status(403).json({
+                ok: false,
+                mensaje: 'No tiene permisos para editar este usuario'
+            });
+        }
         const _a = req.body, { uid, password, google, correo } = _a, resto = __rest(_a, ["uid", "password", "google", "correo"]);
-        console.log(req.body);
         if (password) {
             // Encriptar la contraseña
             const salt = bcryptjs.genSaltSync();
@@ -99,9 +106,8 @@ usuario.post('/edit', [
             resto.correo = correo;
         }
         // Guardar en BD
-        usuario_1.Usuario.findByIdAndUpdate(uid, resto, { new: true }, (err, usuarioEditado) => {
-            if (err)
-                throw err;
+        usuario_1.Usuario.findByIdAndUpdate(uid, resto, { new: true })
+            .then(usuarioEditado => {
             if (!usuarioEditado) {
                 return res.status(400).json({
                     ok: false,
@@ -114,6 +120,13 @@ usuario.post('/edit', [
                 mensaje: 'Registro actualizado correctamente',
                 data: [usuarioEditado]
             });
+        })
+            .catch(error => {
+            console.log(error);
+            res.status(400).json({
+                ok: false,
+                mensaje: 'Algo salio mal'
+            });
         });
     }
     catch (error) {
@@ -123,7 +136,7 @@ usuario.post('/edit', [
         });
     }
 });
-usuario.get('/', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+usuario.get('/', [validar_jwt_1.validarJWT], (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const totalUsuarios = yield usuario_1.Usuario.find({ activo: true });
         res.json({
@@ -145,13 +158,14 @@ usuario.post('/delete', [
     (0, express_validator_1.check)('uid').custom(db_validators_1.existeUsuarioPorId),
     validar_campos_1.validarCampos
 ], (req, res) => {
-    const payload = {
-        activo: false,
-        id: req.body.uid
-    };
-    usuario_1.Usuario.findByIdAndUpdate(payload.id, payload, { new: true }, (err, usuarioBorrado) => {
-        if (err)
-            throw err;
+    if (req.body.uid !== String(req.usuario._id)) {
+        return res.status(403).json({
+            ok: false,
+            mensaje: 'No tiene permisos para eliminar este usuario'
+        });
+    }
+    usuario_1.Usuario.findByIdAndUpdate(req.body.uid, { activo: false }, { new: true })
+        .then(usuarioBorrado => {
         if (!usuarioBorrado) {
             return res.json({
                 ok: false,
@@ -163,6 +177,13 @@ usuario.post('/delete', [
             ok: true,
             mensaje: 'Registro eliminado correctamente',
             data: [usuarioBorrado]
+        });
+    })
+        .catch(error => {
+        console.log(error);
+        res.status(400).json({
+            ok: false,
+            mensaje: 'Algo salio mal'
         });
     });
 });

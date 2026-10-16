@@ -1,10 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.config = void 0;
+require('dotenv').config();
 exports.config = {
-    // base: 'mongodb+srv://AdminMella:carola7810@cluster0.09jiw.mongodb.net/gastosBD?retryWrites=true&w=majority' || 'mongodb://localhost:27017/gastosBD',
     serverport: Number(process.env.PORT) || 3000,
-    // db: 'mongodb://localhost:27017/gastosBD',
-    db: `mongodb+srv://AdminMella:carola7810@cluster0.09jiw.mongodb.net/gastosBD?retryWrites=true&w=majority`,
-    SECRETORPRIVATEKEY: 'E5M1CAV3'
+    db: process.env.DB_CNN || 'mongodb+srv://AdminMella:carola7810@cluster0.09jiw.mongodb.net/gastosBD?retryWrites=true&w=majority',
+    SECRETORPRIVATEKEY: process.env.SECRETORPRIVATEKEY || 'E5M1CAV3'
 };

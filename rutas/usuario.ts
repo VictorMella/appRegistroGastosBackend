@@ -49,9 +49,10 @@ usuario.post('/create', [
                 })
             })
             .catch(err => {
+                console.log(err)
                 res.json({
                     ok: false,
-                    mensaje: err,
+                    mensaje: 'No se pudo crear el usuario',
                     data: []
                 })
             })
@@ -66,6 +67,7 @@ usuario.post('/create', [
 
 
 usuario.post('/edit', [
+    validarJWT,
     check('nombre', 'El nombre es obligatorio').not().isEmpty(),
     check('password', 'El password debe de ser más de 6 letras').isLength({ min: 6 }),
     check('correo', 'El correo no es válido').isEmail(),
@@ -73,10 +75,15 @@ usuario.post('/edit', [
     check('uid').custom( existeUsuarioPorId ),
     check('correo').custom(emailExiste),
     validarCampos
-], (req: Request, res: Response) => {
+], (req: any, res: Response) => {
     try {
+        if (req.body.uid !== String(req.usuario._id)) {
+            return res.status(403).json({
+                ok: false,
+                mensaje: 'No tiene permisos para editar este usuario'
+            })
+        }
         const { uid, password, google, correo, ...resto } = req.body;
-    console.log(req.body)
         if (password) {
             // Encriptar la contraseña
             const salt = bcryptjs.genSaltSync()
@@ -85,21 +92,28 @@ usuario.post('/edit', [
         }
 
         // Guardar en BD
-        Usuario.findByIdAndUpdate(uid, resto, { new: true }, (err, usuarioEditado) => {
-            if (err) throw err
-            if (!usuarioEditado) {
-                return res.status(400).json({
-                    ok: false,
-                    mensaje: 'Datos incorrectos',
-                    data: []
+        Usuario.findByIdAndUpdate(uid, resto, { new: true })
+            .then(usuarioEditado => {
+                if (!usuarioEditado) {
+                    return res.status(400).json({
+                        ok: false,
+                        mensaje: 'Datos incorrectos',
+                        data: []
+                    })
+                }
+                res.json({
+                    ok: true,
+                    mensaje: 'Registro actualizado correctamente',
+                    data: [usuarioEditado]
                 })
-            }
-            res.json({
-                ok: true,
-                mensaje: 'Registro actualizado correctamente',
-                data: [usuarioEditado]
             })
-        })
+            .catch(error => {
+                console.log(error)
+                res.status(400).json({
+                    ok: false,
+                    mensaje: 'Algo salio mal'
+                })
+            })
     } catch (error) {
         console.log(error)
         return res.status(400).json({
@@ -108,7 +122,7 @@ usuario.post('/edit', [
     }
 })
 
-usuario.get('/', async(req: Request, res: Response) => {
+usuario.get('/', [validarJWT], async(req: Request, res: Response) => {
     try {
         const totalUsuarios = await Usuario.find({ activo: true })
         res.json({
@@ -129,26 +143,35 @@ usuario.post('/delete', [
     check('uid', 'No es un ID válido').isMongoId(),
     check('uid').custom( existeUsuarioPorId ),
     validarCampos
-],(req: Request, res: Response) => {
-    const payload = {
-        activo: false,
-        id: req.body.uid
-    }
-    Usuario.findByIdAndUpdate(payload.id, payload, { new: true }, (err, usuarioBorrado) => {
-        if (err) throw err
-        if (!usuarioBorrado) {
-            return res.json({
-                ok: false,
-                mensaje: 'Datos incorrectos',
-                data: []
-            })
-        }
-        res.json({
-            ok: true,
-            mensaje: 'Registro eliminado correctamente',
-            data: [usuarioBorrado]
+],(req: any, res: Response) => {
+    if (req.body.uid !== String(req.usuario._id)) {
+        return res.status(403).json({
+            ok: false,
+            mensaje: 'No tiene permisos para eliminar este usuario'
         })
-    })
+    }
+    Usuario.findByIdAndUpdate(req.body.uid, { activo: false }, { new: true })
+        .then(usuarioBorrado => {
+            if (!usuarioBorrado) {
+                return res.json({
+                    ok: false,
+                    mensaje: 'Datos incorrectos',
+                    data: []
+                })
+            }
+            res.json({
+                ok: true,
+                mensaje: 'Registro eliminado correctamente',
+                data: [usuarioBorrado]
+            })
+        })
+        .catch(error => {
+            console.log(error)
+            res.status(400).json({
+                ok: false,
+                mensaje: 'Algo salio mal'
+            })
+        })
 })
 
 export default usuario
