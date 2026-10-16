@@ -1,0 +1,468 @@
+{
+  "info": {
+    "name": "AppRegistroGastosBackend (Local)",
+    "_postman_id": "ab13f4d0-3b2c-4f8a-9b7e-registrogastos-local",
+    "description": "Colección para levantar y probar el backend de forma local. Usa la variable {{baseUrl}} (por defecto http://localhost:3000). Todas las rutas protegidas usan el header 'appToken' (no 'Authorization' ni 'x-token').",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000", "type": "string" },
+    { "key": "token", "value": "", "type": "string" },
+    { "key": "uid", "value": "", "type": "string", "description": "_id de Mongo del usuario (lo usan /usuario/edit y /usuario/delete)" },
+    { "key": "idUsuarioCreacion", "value": "1", "type": "string", "description": "Campo numérico 'identificador' del usuario (devuelto por /auth/login y /usuario). NO es el _id de Mongo" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    if (json?.data?.token) {",
+                  "        pm.collectionVariables.set('token', json.data.token);",
+                  "    }",
+                  "    if (json?.data?.usuario?.uid) {",
+                  "        pm.collectionVariables.set('uid', json.data.usuario.uid);",
+                  "    }",
+                  "    if (json?.data?.usuario?.identificador !== undefined) {",
+                  "        pm.collectionVariables.set('idUsuarioCreacion', json.data.usuario.identificador);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"correo\": \"usuario@ejemplo.com\",\n    \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Renew Token",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "appToken", "value": "{{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/auth/renew",
+              "host": ["{{baseUrl}}"],
+              "path": ["auth", "renew"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Usuario",
+      "item": [
+        {
+          "name": "Crear usuario",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"nombre\": \"Usuario Ejemplo\",\n    \"correo\": \"usuario@ejemplo.com\",\n    \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/usuario/create",
+              "host": ["{{baseUrl}}"],
+              "path": ["usuario", "create"]
+            }
+          }
+        },
+        {
+          "name": "Editar usuario",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "appToken", "value": "{{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"uid\": \"{{uid}}\",\n    \"nombre\": \"Usuario Editado\",\n    \"correo\": \"usuario@ejemplo.com\",\n    \"password\": \"123456\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/usuario/edit",
+              "host": ["{{baseUrl}}"],
+              "path": ["usuario", "edit"]
+            }
+          },
+          "response": [],
+          "description": "Requiere appToken. El servidor rechaza con 403 si 'uid' no coincide con el usuario dueño del token."
+        },
+        {
+          "name": "Listar usuarios",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "appToken", "value": "{{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/usuario",
+              "host": ["{{baseUrl}}"],
+              "path": ["usuario"]
+            }
+          }
+        },
+        {
+          "name": "Eliminar usuario",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "appToken", "value": "{{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"uid\": \"{{uid}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/usuario/delete",
+              "host": ["{{baseUrl}}"],
+              "path": ["usuario", "delete"]
+            }
+          },
+          "response": [],
+          "description": "El servidor rechaza con 403 si 'uid' no coincide con el usuario dueño del token."
+        }
+      ]
+    },
+    {
+      "name": "Tarjeta Débito",
+      "item": [
+        {
+          "name": "Crear registro",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "appToken", "value": "{{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"monto\": 10000,\n    \"tipo\": \"Egreso\",\n    \"descripcion\": \"Compra de ejemplo\",\n    \"fechaCompra\": \"2026-10-16\",\n    \"idUsuarioCreacion\": {{idUsuarioCreacion}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/debito/crear-registro",
+              "host": ["{{baseUrl}}"],
+              "path": ["debito", "crear-registro"]
+            }
+          }
+        },
+        {
+          "name": "Listar registros paginados",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "appToken", "value": "{{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/debito?pagina=1&registrosPorPagina=10&mes=10&anio=2026&idUsuarioCreacion={{idUsuarioCreacion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["debito"],
+              "query": [
+                { "key": "pagina", "value": "1" },
+                { "key": "registrosPorPagina", "value": "10" },
+                { "key": "mes", "value": "10" },
+                { "key": "anio", "value": "2026" },
+                { "key": "idUsuarioCreacion", "value": "{{idUsuarioCreacion}}" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Años con registros",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "appToken", "value": "{{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/debito/anio?idUsuarioCreacion={{idUsuarioCreacion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["debito", "anio"],
+              "query": [
+                { "key": "idUsuarioCreacion", "value": "{{idUsuarioCreacion}}" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar registro",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "appToken", "value": "{{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"_id\": \"\",\n    \"monto\": 15000,\n    \"tipo\": \"Egreso\",\n    \"descripcion\": \"Compra actualizada\",\n    \"fechaCompra\": \"2026-10-16\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/debito/update",
+              "host": ["{{baseUrl}}"],
+              "path": ["debito", "update"]
+            }
+          },
+          "response": [],
+          "description": "El servidor rechaza con 403 si el registro ('_id') no pertenece al usuario dueño del token."
+        },
+        {
+          "name": "Eliminar registro",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "appToken", "value": "{{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"_id\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/debito/delete",
+              "host": ["{{baseUrl}}"],
+              "path": ["debito", "delete"]
+            }
+          },
+          "response": [],
+          "description": "El servidor rechaza con 403 si el registro ('_id') no pertenece al usuario dueño del token."
+        }
+      ]
+    },
+    {
+      "name": "Tarjeta Crédito Nacional",
+      "item": [
+        {
+          "name": "Crear registro",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "appToken", "value": "{{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"monto\": 30000,\n    \"tipo\": \"Egreso\",\n    \"cuotas\": 3,\n    \"facturacionInmediata\": false,\n    \"descripcion\": \"Compra en cuotas\",\n    \"fechaCompra\": \"2026-10-16\",\n    \"nacional\": true,\n    \"idUsuarioCreacion\": {{idUsuarioCreacion}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/credito/crear-registro",
+              "host": ["{{baseUrl}}"],
+              "path": ["credito", "crear-registro"]
+            }
+          }
+        },
+        {
+          "name": "Listar registros paginados",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "appToken", "value": "{{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/credito?pagina=1&registrosPorPagina=10&mes=10&anio=2026&registrosNacionales=true&idUsuarioCreacion={{idUsuarioCreacion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["credito"],
+              "query": [
+                { "key": "pagina", "value": "1" },
+                { "key": "registrosPorPagina", "value": "10" },
+                { "key": "mes", "value": "10" },
+                { "key": "anio", "value": "2026" },
+                { "key": "registrosNacionales", "value": "true" },
+                { "key": "idUsuarioCreacion", "value": "{{idUsuarioCreacion}}" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Años con registros",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "appToken", "value": "{{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/credito/anio?registrosNacionales=true&idUsuarioCreacion={{idUsuarioCreacion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["credito", "anio"],
+              "query": [
+                { "key": "registrosNacionales", "value": "true" },
+                { "key": "idUsuarioCreacion", "value": "{{idUsuarioCreacion}}" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar registro",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "appToken", "value": "{{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"_id\": \"\",\n    \"monto\": 30000,\n    \"tipo\": \"Egreso\",\n    \"cuotas\": 3,\n    \"nCuotas\": 1,\n    \"facturacionInmediata\": false,\n    \"descripcion\": \"Compra actualizada\",\n    \"fechaCompra\": \"2026-10-16\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/credito/update",
+              "host": ["{{baseUrl}}"],
+              "path": ["credito", "update"]
+            }
+          },
+          "response": [],
+          "description": "El servidor rechaza con 403 si el registro ('_id') no pertenece al usuario dueño del token. La ruta ya no usa el parámetro :id (estaba sin uso)."
+        },
+        {
+          "name": "Eliminar registro",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "appToken", "value": "{{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"identificador\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/credito/delete",
+              "host": ["{{baseUrl}}"],
+              "path": ["credito", "delete"]
+            }
+          },
+          "response": [],
+          "description": "Borra todas las cuotas que comparten 'identificador'. El servidor rechaza con 403 si no pertenecen al usuario dueño del token."
+        }
+      ]
+    },
+    {
+      "name": "Otros Gastos",
+      "item": [
+        {
+          "name": "Crear registro",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "appToken", "value": "{{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"monto\": 5000,\n    \"tipo\": \"Egreso\",\n    \"descripcion\": \"Otro gasto de ejemplo\",\n    \"fechaCompra\": \"2026-10-16\",\n    \"idUsuarioCreacion\": {{idUsuarioCreacion}}\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/otros-gastos/crear-registro",
+              "host": ["{{baseUrl}}"],
+              "path": ["otros-gastos", "crear-registro"]
+            }
+          }
+        },
+        {
+          "name": "Listar registros paginados",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "appToken", "value": "{{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/otros-gastos?pagina=1&registrosPorPagina=10&mes=10&anio=2026&idUsuarioCreacion={{idUsuarioCreacion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["otros-gastos"],
+              "query": [
+                { "key": "pagina", "value": "1" },
+                { "key": "registrosPorPagina", "value": "10" },
+                { "key": "mes", "value": "10" },
+                { "key": "anio", "value": "2026" },
+                { "key": "idUsuarioCreacion", "value": "{{idUsuarioCreacion}}" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Años con registros",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "appToken", "value": "{{token}}" }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/otros-gastos/anio?idUsuarioCreacion={{idUsuarioCreacion}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["otros-gastos", "anio"],
+              "query": [
+                { "key": "idUsuarioCreacion", "value": "{{idUsuarioCreacion}}" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Actualizar registro",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "appToken", "value": "{{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"_id\": \"\",\n    \"monto\": 7000,\n    \"tipo\": \"Egreso\",\n    \"descripcion\": \"Gasto actualizado\",\n    \"fechaCompra\": \"2026-10-16\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/otros-gastos/update",
+              "host": ["{{baseUrl}}"],
+              "path": ["otros-gastos", "update"]
+            }
+          },
+          "response": [],
+          "description": "El servidor rechaza con 403 si el registro ('_id') no pertenece al usuario dueño del token."
+        },
+        {
+          "name": "Eliminar registro",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "appToken", "value": "{{token}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"_id\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/otros-gastos/delete",
+              "host": ["{{baseUrl}}"],
+              "path": ["otros-gastos", "delete"]
+            }
+          },
+          "response": [],
+          "description": "El servidor rechaza con 403 si el registro ('_id') no pertenece al usuario dueño del token."
+        }
+      ]
+    }
+  ]
+}

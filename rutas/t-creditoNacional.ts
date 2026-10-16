@@ -1,199 +1,102 @@
-import { Router, Request, Response } from "express"
-import { DtoPayloadCredito } from "../interfaces/i-payloadCredito.interface"
+import { Request, Response } from "express"
 import { ITCredito } from "../interfaces/t-credito.interface"
 import { TCredito } from "../models/tCredito"
+import { crearLedgerRouter, parseMesAnio } from "../helpers/crear-ledger-router"
 
 const moment = require('moment')
 
-const tCreditoRutas = Router()
-
-//Crear registro
-tCreditoRutas.post('/crear-registro', (req: Request, res: Response) => {
-    let body = formatPayloadLsCredito(req.body)
-    TCredito.create(body)
-        .then(registroCredito => {
+const tCreditoRutas = crearLedgerRouter(TCredito, {
+    nombreListado: 'registrosTCredito',
+    filtrosExtra: (query) => ({ nacional: query.registrosNacionales }),
+    crearRegistro: async (req: Request, res: Response) => {
+        try {
+            const payloadsCuotas = construirCuotasCredito(req.body)
+            const registros = await Promise.all(payloadsCuotas.map(payload => TCredito.create(payload)))
             res.json({
                 ok: true,
                 mensaje: 'Registro creado correctamente',
-                data: [registroCredito]
+                data: registros
             })
-        })
-        .catch(err => {
-            res.json({
-                ok: false,
-                mensaje: err,
-                data: []
-            })
-        })
-})
-
-// Registos paginados
-tCreditoRutas.get('/', async (req: any, res: Response) => {
-    let pagina = Number(req.query.pagina) || 1
-    let saltar = pagina - 1
-    const registrosPorPagina = Number(req.query.registrosPorPagina) || 10
-    saltar = saltar * registrosPorPagina
-    const registrosTCredito = await TCredito.find({ activo: true, mes: req.query.mes, anio: req.query.anio, nacional: req.query.registrosNacionales, idUsuarioCreacion: req.query.idUsuarioCreacion })
-        .sort({ fechaCompra: -1 }) // Ordenar lista
-        .skip(saltar) //Saltar registros
-        .limit(registrosPorPagina) // Limit es para el número de usuarios que queremos obtener
-        .exec()
-    const totalRegistrosCredito = await TCredito.find({ activo: true, mes: req.query.mes, anio: req.query.anio, nacional: req.query.registrosNacionales, idUsuarioCreacion: req.query.idUsuarioCreacion })
-        .exec()
-
-    const totalMontoMesCredito = await TCredito.find({ activo: true, mes: req.query.mes, anio: req.query.anio, nacional: req.query.registrosNacionales, idUsuarioCreacion: req.query.idUsuarioCreacion })
-        .exec()
-
-    res.json({
-        ok: totalRegistrosCredito.length ? true : false,
-        mensaje: totalRegistrosCredito.length ? '' : 'Busqueda sin resultados',
-        data: [{
-            pagina,
-            cantidadRegistros: registrosTCredito.length,
-            registrosPorPagina: registrosPorPagina,
-            totalRegistros: totalRegistrosCredito.length,
-            registrosTCredito,
-            totalMontoMes: totalMontoMesCredito.reduce((acc, curr) => acc + curr.monto, 0)
-        }]
-    })
-})
-
-// // Años con registros
-tCreditoRutas.get('/anio', async (req: any, res: Response) => {
-    const añosConRegistros = await TCredito.find({ activo: true, nacional: req.query.registrosNacionales, idUsuarioCreacion: req.query.idUsuarioCreacion })
-    .sort({ anio: -1 }) // Ordenar lista
-    .exec()
-
-    res.json({
-        ok: true,
-        mensaje: '',
-        data: [... new Set(añosConRegistros.filter(item => item.anio).map(item => item.anio))]
-    })
-})
-
-// ACTUALIZAR 
-tCreditoRutas.post('/update/:id', (req: Request, res: Response) => {
-    const payload: DtoPayloadCredito = {
-        id: req.body._id,
-        monto: req.body.monto,
-        tipo: req.body.tipo,
-        cuotas: req.body.cuotas,
-        nCuota: req.body.nCuotas,
-        facturacionInmediata: req.body.facturacionInmediata,
-        descripcion: req.body.descripcion,
-        fechaCompra: req.body.fechaCompra,
-        mes: parseInt(req.body.fechaCompra.split('-')[1]),
-        anio: parseInt(req.body.fechaCompra.split('-')[0])
-    }
-    TCredito.findByIdAndUpdate(payload.id, payload, { new: true }, (err, registroCredito) => {
-        if (err) throw err
-        if (!registroCredito) {
-            return res.json({
-                ok: false,
-                mensaje: 'Datos incorrectos',
-                data: []
-            })
-        }
-        res.json({
-            ok: true,
-            mensaje: 'Registro actualizado correctamente',
-            data: [registroCredito]
-        })
-    })
-})
-// Eliminar registro 
-tCreditoRutas.post('/delete', async (req: Request, res: Response) => {
-    const identificador = req.body.identificador
-    const payload = {
-        activo: false,
-        id: req.body._id
-    }
-    const lsRegsitrosPorEliminar = await TCredito.find({ identificador: identificador })
-    let ultimoRegistro = false
-    if (lsRegsitrosPorEliminar.length > 0) {
-        lsRegsitrosPorEliminar.forEach((item, index) => {
-            const payload = {
-                activo: false,
-                id: item._id
-            }
-            ultimoRegistro = lsRegsitrosPorEliminar.length == index + 1
-            eliminarRegistros(payload, res, ultimoRegistro)
-        })
-    }
-})
-
-const formatPayloadLsCredito = (lsRegistro: ITCredito) => {
-    const identificador = makeRandomId(12)
-    let totalCompra = lsRegistro.monto
-    if (lsRegistro.cuotas === 1) {
-        const date = lsRegistro.fechaCompra.toString()
-        lsRegistro.facturacionInmediata = true
-        lsRegistro.mes = parseInt(date.split('-')[1])
-        lsRegistro.anio = parseInt(date.split('-')[0])
-        lsRegistro.identificador = identificador
-        lsRegistro.nCuota = 1
-        lsRegistro.totalCompra = totalCompra
-        return lsRegistro
-    }
-    if (lsRegistro.cuotas > 1) {
-        let contador = 0
-        let cuotas = lsRegistro.cuotas, newMes = new Date(lsRegistro.fechaCompra)
-        const valorAddMes = lsRegistro.facturacionInmediata ? 0 : 1
-        while (contador < cuotas) {
-            const addNewMes = moment(newMes).add((contador + valorAddMes), 'months')
-            const formatMes = moment(addNewMes).format('YYYY-MM-DD').toString()
-            const addanio = parseInt(formatMes.split('-')[0]), addmes = parseInt(formatMes.split('-')[1])
-            lsRegistro.mes = addmes
-            lsRegistro.anio = addanio
-            lsRegistro.nCuota = contador + 1
-            lsRegistro.monto = Math.round(totalCompra / cuotas)
-            lsRegistro.identificador = identificador
-            lsRegistro.totalCompra = totalCompra
-            crearRegistros(lsRegistro)
-            contador += 1
-        }
-    }
-}
-
-const eliminarRegistros = (payload: any, res: Response, ultimoRegistro: boolean): void => {
-    TCredito.findByIdAndUpdate(payload.id, payload, { new: true }, (err, registroCredito) => {
-        if (err) {
+        } catch (err) {
             console.log(err)
-            res.sendStatus(500)
-            return
-        }
-        if (!registroCredito && ultimoRegistro) {
-            return res.json({
-                ok: false,
-                mensaje: 'Datos incorrectos',
-                data: []
-            })
-        }
-        if (ultimoRegistro) {
             res.json({
-                ok: true,
-                mensaje: 'Registro eliminado correctamente',
+                ok: false,
+                mensaje: 'No se pudo crear el registro',
                 data: []
             })
         }
-    })
+    },
+    construirPayloadActualizacion: (body) => ({
+        monto: body.monto,
+        tipo: body.tipo,
+        cuotas: body.cuotas,
+        nCuota: body.nCuotas,
+        facturacionInmediata: body.facturacionInmediata,
+        descripcion: body.descripcion,
+        fechaCompra: body.fechaCompra,
+        ...parseMesAnio(body.fechaCompra)
+    }),
+    eliminarRegistro: async (req: any, res: Response) => {
+        const identificador = req.body.identificador
+        const registros = await TCredito.find({ identificador })
+
+        if (registros.length === 0) {
+            return res.json({ ok: false, mensaje: 'Datos incorrectos', data: [] })
+        }
+
+        if (registros[0].idUsuarioCreacion !== req.usuario.identificador) {
+            return res.status(403).json({ ok: false, mensaje: 'No tiene permisos sobre este registro', data: [] })
+        }
+
+        await Promise.all(registros.map(registro => TCredito.findByIdAndUpdate(registro._id, { activo: false })))
+
+        res.json({ ok: true, mensaje: 'Registro eliminado correctamente', data: [] })
+    }
+})
+
+/** Construye un payload de TCredito por cada cuota del registro. */
+const construirCuotasCredito = (lsRegistro: ITCredito): any[] => {
+    const identificador = makeRandomId(12)
+    const totalCompra = lsRegistro.monto
+    const cuotas = lsRegistro.cuotas
+
+    if (cuotas === 1) {
+        const date = lsRegistro.fechaCompra.toString()
+        return [{
+            ...lsRegistro,
+            facturacionInmediata: true,
+            mes: parseInt(date.split('-')[1]),
+            anio: parseInt(date.split('-')[0]),
+            identificador,
+            nCuota: 1,
+            totalCompra
+        }]
+    }
+
+    const payloadsCuotas = []
+    const valorAddMes = lsRegistro.facturacionInmediata ? 0 : 1
+    for (let contador = 0; contador < cuotas; contador++) {
+        const addNewMes = moment(new Date(lsRegistro.fechaCompra)).add(contador + valorAddMes, 'months')
+        const formatMes = moment(addNewMes).format('YYYY-MM-DD').toString()
+        const anio = parseInt(formatMes.split('-')[0])
+        const mes = parseInt(formatMes.split('-')[1])
+        payloadsCuotas.push({
+            ...lsRegistro,
+            mes,
+            anio,
+            nCuota: contador + 1,
+            monto: Math.round(totalCompra / cuotas),
+            identificador,
+            totalCompra
+        })
+    }
+    return payloadsCuotas
 }
 
-const crearRegistros = (lsRegistro: any): void => {
-    let res: Response<any, Record<string, any>>
-    TCredito.create(lsRegistro)
-        .then((res) => {
-            console.log('registroCredito ok')
-        })
-        .catch(err => {
-            console.log('badRequest', err)
-        })
-}
-
-const makeRandomId = (length: any) => {
+const makeRandomId = (length: number) => {
     let result = ''
     const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-    for (let i = 0;i < length;i++) {
+    for (let i = 0; i < length; i++) {
         result += characters.charAt(Math.floor(Math.random() * characters.length))
     }
     return result

@@ -26,26 +26,17 @@ auth.post('/login', [
     try {
         //Verificar si el usuario existe
         const usuario = yield usuario_1.Usuario.findOne({ correo });
-        if (!usuario) {
-            return res.status(400).json({
-                ok: false,
-                mensaje: 'No existe un usuario asociado a ese correo'
-            });
-        }
-        //Verificar si el usuario esta activo
-        if (!usuario.activo) {
-            return res.status(400).json({
-                ok: false,
-                mensaje: 'El usuario se encuentra inactivo'
-            });
+        const credencialesInvalidas = () => res.status(400).json({
+            ok: false,
+            mensaje: 'Correo o contraseña incorrectos'
+        });
+        if (!usuario || !usuario.activo) {
+            return credencialesInvalidas();
         }
         //Verificar la contraseña
         const validPass = bcryptjs.compareSync(password, usuario.password);
         if (!validPass) {
-            return res.status(400).json({
-                ok: false,
-                mensaje: 'La contraseña no es correcta'
-            });
+            return credencialesInvalidas();
         }
         //Generar JWT
         const token = yield (0, generar_jwt_1.generarJWT)(usuario.id);

@@ -1,2 +1,2 @@
-declare const otrosGastosRutas: import("express-serve-static-core").Router;
+declare const otrosGastosRutas: import("express").Router;
 export default otrosGastosRutas;
